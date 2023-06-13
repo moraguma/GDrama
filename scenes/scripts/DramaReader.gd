@@ -112,7 +112,7 @@ func jump(target_beat: String) -> void:
 # If the pointer is on a choice, makes the specified choice
 func make_choice(choice: int) -> void:
 	if check_drama():
-		var line = drama[beat]["steps"][pointer]
+		var line = drama["beats"][beat]["steps"][pointer]
 		if line["type"] == "CHOICE":
 			if choice >= 0 and choice < len(line["results"]):
 				jump(line["results"][choice])
@@ -128,12 +128,12 @@ func next_line() -> Dictionary:
 	if check_drama():
 		var result
 		while result == null:
-			if not pointer in drama[beat]["steps"]:
-				if drama[beat]["next"] == "":
+			if not pointer in drama["beats"][beat]["steps"]:
+				if drama["beats"][beat]["next"] == "":
 					return {"type": "END", "info": ""}
-				jump(drama[beat]["next"])
+				jump(drama["beats"][beat]["next"])
 			
-			var line = drama[beat]["steps"][pointer]
+			var line = drama["beats"][beat]["steps"][pointer]
 			
 			match line["type"]:
 				"DIRECTION":

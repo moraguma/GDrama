@@ -5,9 +5,13 @@ extends Node
 func _ready():
 	var drama_reader = DramaReader.new()
 	
-	var t = drama_reader.parse_call("<jump \"arg1\" {arg 2}>", 0)
-	
 	drama_reader.load_json("res://resources/example.json")
+	
+	var line = drama_reader.next_line()
+	while line["type"] != "END":
+		if line["type"] == "CHOICE":
+			drama_reader.make_choice(0)
+		line = drama_reader.next_line()
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
