@@ -16,7 +16,7 @@ config/icon="res://icon.svg"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/GDDrama/plugin.cfg")
+enabled=PackedStringArray()
 
 [rendering]
 

@@ -2,9 +2,9 @@
 
 ## Writing in GDrama
 
-.gdrama is a simple language to write cutscenes. In practice, all .gdrama files are converted to a JSON format. .gdrama exists for ease of use.
+GDrama is a simple language to write cutscenes. In practice, all .gdrama files are converted to a JSON format. GDrama exists to make writing scenes easier.
 
-The way .gdrama works
+For instance, this is a simple scene written in GDrama.
 
 ~~~
 <beat Start>
@@ -25,6 +25,85 @@ The way .gdrama works
 
 <beat End>
     Tom: Anyway, I have to go
+    <end "Regular ending">
+~~~
+
+When converted to JSON, it will look like this
+
+~~~json
+{
+    "start": "Start",
+    "beats": {
+        "Start": {
+            "steps": {
+                "0": {
+                    "type": "DIRECTION",
+                    "actor": "Tom",
+                    "direction": "Hey! (wait 0.5)Over here!(wave)"
+                },
+                "1": {
+                    "type": "DIRECTION",
+                    "actor": "Tom",
+                    "direction": "This is an example scene"
+                },
+                "2": {
+                    "type": "DIRECTION",
+                    "actor": "Tom",
+                    "direction": "[wave]What do you think?"
+                },
+                "3": {
+                    "type": "CHOICE",
+                    "choices": ["I like it!", "Not a huge fan"],
+                    "results": ["Like", "Dislike"],
+                    "conditions": ["{get_true}", "{get_true}"]
+                }
+            },
+            "next": "Like"
+        },
+        "Like": {
+            "steps": {
+                "0": {
+                    "type": "DIRECTION",
+                    "actor": "Tom",
+                    "direction": "Well, I'm glad!"
+                },
+                "1": {
+                    "type": "CALL",
+                    "call": "{jump End}"
+                }
+            },
+            "next": "Dislike"
+        },
+        "Dislike": {
+            "steps": {
+                "0": {
+                    "type": "DIRECTION",
+                    "actor": "Tom",
+                    "direction": "That's a shame"
+                },
+                "1": {
+                    "type": "CALL",
+                    "call": "{jump End}"
+                }
+            },
+            "next": "End"
+        },
+        "End": {
+            "steps": {
+                "0": {
+                    "type": "DIRECTION",
+                    "actor": "Tom",
+                    "direction": "Anyway, I have to go"
+                },
+                "1": {
+                    "type": "END",
+                    "info": "Regular ending"
+                }
+            },
+            "next": ""
+        }
+    }
+}
 ~~~
 
 ## Commands
@@ -44,6 +123,7 @@ Commands wrapped up in <> are going to be completely processed by the time the .
 |\<_call_ {_function_ arg1, arg2...}>|Calls a DramaReader level function|
 |\<_jump_ "Beat name">| Jumps to the specified beat. Is actually a DramaReader level function - equivalent to \<_call_ {jump "Beat name"}>|
 |\<_choice_ "Choice text" "Resulting beat" {DramaReader condition}>|Defines a new choice with an existence condition. If no existence condition is defined, it is set as true by default|
+|\<_end_ "Info">|Defines an ending|
 
 ### {} - DramaReader level commands
 
