@@ -1,73 +1,82 @@
 {
-    "start": "Start",
-    "beats": {
-        "Start": {
-            "steps": {
-                "0": {
-                    "type": "DIRECTION",
-                    "actor": "Tom",
-                    "direction": "Hey! (wait 0.5)Over here!(wave)"
-                },
-                "1": {
-                    "type": "DIRECTION",
-                    "actor": "Tom",
-                    "direction": "This is an example scene"
-                },
-                "2": {
-                    "type": "DIRECTION",
-                    "actor": "Tom",
-                    "direction": "[wave]What do you think?"
-                },
-                "3": {
-                    "type": "CHOICE",
-                    "choices": ["I like it!", "Not a huge fan"],
-                    "results": ["Like", "Dislike"],
-                    "conditions": ["{get_true}", "{get_true}"]
-                }
-            },
-            "next": "Like"
+  "start": "Start",
+  "beats": {
+    "Start": {
+      "steps": {
+        "0": {
+          "type": "DIRECTION",
+          "actor": "Tom",
+          "direction": "Hey! (wait 0.5)Over here!(wave)"
         },
-        "Like": {
-            "steps": {
-                "0": {
-                    "type": "DIRECTION",
-                    "actor": "Tom",
-                    "direction": "Well, I'm glad!"
-                },
-                "1": {
-                    "type": "CALL",
-                    "call": "{jump End}"
-                }
-            },
-            "next": "Dislike"
+        "1": {
+          "type": "DIRECTION",
+          "actor": "Tom",
+          "direction": "This is an example scene"
         },
-        "Dislike": {
-            "steps": {
-                "0": {
-                    "type": "DIRECTION",
-                    "actor": "Tom",
-                    "direction": "That's a shame"
-                },
-                "1": {
-                    "type": "CALL",
-                    "call": "{jump End}"
-                }
-            },
-            "next": "End"
+        "2": {
+          "type": "DIRECTION",
+          "actor": "Tom",
+          "direction": "[wave]What do you think?"
         },
-        "End": {
-            "steps": {
-                "0": {
-                    "type": "DIRECTION",
-                    "actor": "Tom",
-                    "direction": "Anyway, I have to go"
-                },
-                "1": {
-                    "type": "END",
-                    "info": "Regular ending"
-                }
-            },
-            "next": ""
+        "3": {
+          "type": "CHOICE",
+          "choices": [
+            "I like it!",
+            "Not a huge fan"
+          ],
+          "results": [
+            "Like",
+            "Dislike"
+          ],
+          "conditions": [
+            "{get_true}",
+            "{get_true}"
+          ]
         }
+      },
+      "next": "Like"
+    },
+    "Like": {
+      "steps": {
+        "0": {
+          "type": "DIRECTION",
+          "actor": "Tom",
+          "direction": "Well, I'm glad!"
+        },
+        "1": {
+          "type": "CALL",
+          "call": "{jump End}"
+        }
+      },
+      "next": "Dislike"
+    },
+    "Dislike": {
+      "steps": {
+        "0": {
+          "type": "DIRECTION",
+          "actor": "Tom",
+          "direction": "That's a shame"
+        },
+        "1": {
+          "type": "CALL",
+          "call": "{jump End}"
+        }
+      },
+      "next": "End"
+    },
+    "End": {
+      "steps": {
+        "0": {
+          "type": "DIRECTION",
+          "actor": "Tom",
+          "direction": "Anyway, I have to go"
+        },
+        "1": {
+          "type": "END",
+          "info": "Regular ending"
+        }
+      },
+      "next": ""
     }
+  }
 }
