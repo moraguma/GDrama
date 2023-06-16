@@ -9,4 +9,3 @@ func _init(lexeme: String, line: int, type: int, literal):
 	self.line = line
 	self.type = type
 	self.literal = literal
-	
