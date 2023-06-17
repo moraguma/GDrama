@@ -104,7 +104,7 @@ func next_line() -> Dictionary:
 func replace_commands(s: String) -> String:
 	var pos = 0
 	
-	while pos + 1 < len(s):
+	while pos < len(s):
 		if s[pos] == "{" and s[max(pos - 1, 0)] != "\\":
 			var command = GDramaTranspiler.parse_call(s, pos)
 			var new_pos = GDramaTranspiler.advance_until(s, pos, "}")

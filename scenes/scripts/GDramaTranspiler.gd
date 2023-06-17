@@ -185,7 +185,6 @@ static func advance_until(s: String, pos: int, x: String) -> int:
 	while s[pos] != x:
 		pos += 1
 		if pos >= len(s):
-			pos -= 1
 			break
 	return pos
 
@@ -294,6 +293,9 @@ static func replace_consts(s: String, consts: Dictionary) -> String:
 			pos += 1
 			
 			var new_pos = advance_until(s, pos, stopping_char)
+			if new_pos >= len(s):
+				new_pos -= 1
+			
 			var key = s.substr(pos, new_pos - pos)
 			var replacement = "UNDEFINED"
 			if key in consts:

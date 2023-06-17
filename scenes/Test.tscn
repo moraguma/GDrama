@@ -4,3 +4,19 @@
 
 [node name="Test" type="Node"]
 script = ExtResource("1_yqhf6")
+
+[node name="RichTextLabel" type="RichTextLabel" parent="."]
+offset_top = 416.0
+offset_right = 1152.0
+offset_bottom = 593.0
+
+[node name="Button" type="Button" parent="."]
+offset_left = 76.0
+offset_top = 204.0
+offset_right = 274.0
+offset_bottom = 304.0
+text = "Next"
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+
+[connection signal="pressed" from="Button" to="." method="next_line"]
