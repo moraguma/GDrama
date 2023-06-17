@@ -1,4 +1,4 @@
-<const a b>
+<import res://resources/import_test.gdrama>
 
 <beat Start>
     Tom: Hey! $"a"(wait 0.5)Over here!(wave) $a

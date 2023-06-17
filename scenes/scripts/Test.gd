@@ -15,7 +15,7 @@ func _ready():
 	
 	var f = FileAccess.open("res://resources/example.gdrama", FileAccess.READ).get_as_text()
 	print(f)
-	var r = GDramaTranspiler.getJSON(f)
+	var r = GDramaTranspiler.get_json(f)
 	pass
 
 

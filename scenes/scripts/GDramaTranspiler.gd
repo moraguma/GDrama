@@ -5,6 +5,7 @@ const CLOSERS = {"\"": "\"", "{": "}", "<": ">", "\'": "\'"}
 const EMPTY = [" "]
 
 
+# Returns the string s with the character at the given position removed
 static func remove_from_string(s: String, pos: int) -> String:
 	return s.substr(0, pos) + s.substr(pos + 1)
 
@@ -90,6 +91,7 @@ static func advance_until(s: String, pos: int, x: String) -> int:
 			break
 	return pos
 
+
 # Advances spaces in s starting from pos until pos is at \n
 static func advance_until_enter(s: String, pos: int) -> int:
 	if pos >= len(s):
@@ -105,6 +107,8 @@ static func advance_until_enter(s: String, pos: int) -> int:
 	return pos
 
 
+# If the argument array passed contains a different number of arguments than
+# expected, pushes an error message
 static func check_arg_count(l: Array, total_args: int):
 	if len(l) - 1 != total_args:
 		push_error(str(total_args) + " arguments expected in " + l[0] + " function. " + str(len(l) - 1) + "provided") 
@@ -167,8 +171,30 @@ static func replace_consts(s: String, consts: Dictionary) -> String:
 			pos += 1
 	return s
 
+
+# Given a path to a GDrama code, returns a dictionary containing its consts
+static func import_consts(path: String) -> Dictionary:
+	var code = FileAccess.open(path, FileAccess.READ).get_as_text()
+	
+	var consts = {}
+	var pos = 0
+	
+	while pos < len(code):
+		if code[pos] == "\\":
+			pos += 1
+		elif code[pos] == "<":
+			var call = parse_call(code, pos)
+			if call[0] == "const":
+				check_arg_count(call, 2)
+				consts[call[1]] = call[2]
+		
+		pos += 1
+	
+	return consts
+
+
 # Given a GDrama code, returns its resulting JSON dictionary
-static func getJSON(code: String) -> Dictionary:
+static func get_json(code: String) -> Dictionary:
 	var result = {"start": null, "beats": {}}
 	var consts = {}
 	
@@ -184,10 +210,9 @@ static func getJSON(code: String) -> Dictionary:
 					consts[call[1]] = call[2]
 					pos = advance_until(code, pos, ">") + 1
 				"import":
-					# TODO: Implement constant importing
 					check_arg_count(call, 1)
+					consts.merge(import_consts(call[1]), true)
 					pos = advance_until(code, pos, ">") + 1
-					pass
 				"beat":
 					check_arg_count(call, 1)
 					if current_beat != null:
