@@ -1,15 +1,20 @@
-extends Object
+extends Resource
 class_name DramaReader
 
-const CLOSERS = {"\"": "\"", "{": "}", "<": ">", "\'": "\'"}
 
 var drama: Dictionary
 var beat: String
 var pointer: String
 var to_call: Object
 
+
 func _init(to_call: Object = self):
 	self.to_call = to_call
+
+
+# ------------------------------------------------------------------------------
+# Drama Handling
+# ------------------------------------------------------------------------------
 
 
 # Loads and parses a .drama file. If successful, the drama and pointer variables
@@ -46,73 +51,6 @@ func check_drama() -> bool:
 	return false
 
 
-func remove_from_string(s: String, pos: int) -> String:
-	return s.substr(0, pos) + s.substr(pos + 1)
-
-
-func advance_empty_spaces(s: String, pos: int) -> int:
-	while s[pos] == " ":
-		pos += 1
-	return pos
-
-
-# Parses a call String of the form "func arg1 arg2..." into an array R of
-# strings such that R[0] = func and R[1:] = [arg1, arg2, ...]
-func parse_call(call_string: String, pos: int) -> Array[String]:
-	var new_call = String(call_string)
-	
-	if new_call[pos] in CLOSERS:
-		var enveloper = new_call[pos]
-		var subenveloper
-		var result: Array[String]
-		result = []
-		
-		pos += 1
-		var size = 0
-		
-		while new_call[pos + size] != CLOSERS[enveloper]:
-			if new_call[pos + size] == "\\":
-				new_call = remove_from_string(new_call, pos + size)
-				size += 1
-			elif subenveloper != null:
-				if new_call[pos + size] == CLOSERS[subenveloper]:
-					if subenveloper != "{":
-						result.append(new_call.substr(pos, size))
-					else: 
-						result.append(new_call.substr(pos, size + 1))
-					pos = advance_empty_spaces(new_call, pos + size + 1)
-					size = 0
-					subenveloper = null
-				else:
-					size += 1
-			elif new_call[pos + size] in CLOSERS and size == 0:
-				subenveloper = new_call[pos + size]
-				if subenveloper != "{":
-					pos += 1
-			elif new_call[pos + size] == " ":
-				result.append(new_call.substr(pos, size))
-				pos = advance_empty_spaces(new_call, pos + size + 1)
-				size = 0
-			else:
-				size += 1
-		
-		if size != 0:
-			result.append(new_call.substr(pos, size))
-			size = 0
-		
-		return result
-	else:
-		push_error("Invalid call \"" + new_call + "\" at position " + str(pos))
-	
-	return []
-
-
-# Jumps beat and pointer to the start of the specified beat
-func jump(target_beat: String) -> void:
-	beat = target_beat
-	pointer = "0"
-
-
 # If the pointer is on a choice, makes the specified choice
 func make_choice(choice: int) -> void:
 	if check_drama():
@@ -142,13 +80,64 @@ func next_line() -> Dictionary:
 			match line["type"]:
 				"DIRECTION":
 					pointer = str(int(pointer) + 1)
-					result = line
+					
+					result = replace_commands_in_fields(line, ["actor", "direction"])
+					
 				"CHOICE":
 					result = line
+					for i in range(len(result["choices"])):
+						result["choices"][i] = replace_commands(result["choices"][i])
+						
+						var condition = GDramaTranspiler.parse_call(result["conditions"][i], 0)
+						result["conditions"][i] = callv(condition[0], condition.slice(1))
 				"END":
 					result = line
+					result["info"] = replace_commands(result["info"])
 				"CALL":
-					var call = parse_call(line["call"], 0)
+					var call = GDramaTranspiler.parse_call(line["call"], 0)
 					callv(call[0], call.slice(1))
 		return result
 	return {}
+
+
+# Returns the string with all DramaReader level commands replaced
+func replace_commands(s: String) -> String:
+	var pos = 0
+	
+	while pos + 1 < len(s):
+		if s[pos] == "{" and s[max(pos - 1, 0)] != "\\":
+			var command = GDramaTranspiler.parse_call(s, pos)
+			var new_pos = GDramaTranspiler.advance_until(s, pos, "}")
+			
+			s = s.substr(0, pos) + callv(command[0], command.slice(1)) + s.substr(new_pos + 1)
+		pos = GDramaTranspiler.advance_until(s, pos, "{")
+	
+	return s
+
+
+# Given a dict and a list of fields, replaces commands in all specified fields
+func replace_commands_in_fields(d: Dictionary, fields: Array[String]) -> Dictionary:
+	for field in fields:
+		d[field] = replace_commands(d[field])
+	
+	return d
+
+
+# ------------------------------------------------------------------------------
+# GDrama Commands
+# ------------------------------------------------------------------------------
+
+
+# Jumps beat and pointer to the start of the specified beat
+func jump(target_beat: String) -> void:
+	beat = target_beat
+	pointer = "0"
+
+
+# Returns true
+func get_true() -> bool:
+	return true
+
+
+func test(x):
+	return "Test! " + x

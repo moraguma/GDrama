@@ -1,7 +1,8 @@
 <import res://resources/import_test.gdrama>
 
 <beat Start>
-    Tom: Hey! $"a"(wait 0.5)Over here!(wave) $a
+    Tom: Hi! {test hi}
+    Tom: Hey! (wait 0.5)Over here!(wave) $a
     Tom: This is an example scene
     Tom: [wave]What do you think?
 

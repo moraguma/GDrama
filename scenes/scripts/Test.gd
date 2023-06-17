@@ -5,8 +5,7 @@ extends Node
 func _ready():
 	var drama_reader = DramaReader.new()
 	
-	#drama_reader.load_gdrama("res://resources/example.gdrama")
-	drama_reader.load_json("res://resources/transpiled.json")
+	drama_reader.load_gdrama("res://resources/example.gdrama")
 	
 	var line = drama_reader.next_line()
 	while line["type"] != "END":
@@ -16,8 +15,3 @@ func _ready():
 	pass
 	
 	drama_reader.save_json("res://resources/transpiled.json")
-
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta):
-	pass
