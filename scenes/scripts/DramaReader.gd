@@ -31,7 +31,10 @@ func load_json(path: String) -> void:
 
 # Saves the loaded drama file as a json in the specified path
 func save_json(path: String) -> void:
-	pass
+	if check_drama():
+		var file = FileAccess.open(path, FileAccess.WRITE)
+		file.store_string(JSON.stringify(drama))
+		file.close()
 
 
 # Returns true if the drama is loaded. If it's not, returns false and pushes an
