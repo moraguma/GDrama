@@ -86,6 +86,7 @@ static func advance_until(s: String, pos: int, x: String) -> int:
 	while s[pos] != x:
 		pos += 1
 		if pos >= len(s):
+			pos -= 1
 			break
 	return pos
 
@@ -139,6 +140,33 @@ static func get_line_info(s: String) -> Array[String]:
 	return ["", remove_empty_borders(s)]
 
 
+# Given a string and a replacement dict, returns the string with its $values
+# replaced by the ones in the dict
+static func replace_consts(s: String, consts: Dictionary) -> String:
+	var pos = 0
+	while pos < len(s):
+		if s[pos] == "$":
+			var initial_pos = pos
+			var stopping_char = " "
+			if s[pos + 1] == "\"":
+				stopping_char = "\""
+				pos += 1
+			pos += 1
+			
+			var new_pos = advance_until(s, pos, stopping_char)
+			var key = s.substr(pos, new_pos - pos)
+			var replacement = "UNDEFINED"
+			if key in consts:
+				replacement = consts[key]
+			
+			s = s.substr(0, initial_pos) + replacement + s.substr(new_pos if stopping_char == " " else new_pos + 1)
+			pos = initial_pos + len(replacement)
+		else:
+			if s[pos] == "\\":
+				s = remove_from_string(s, pos)
+			pos += 1
+	return s
+
 # Given a GDrama code, returns its resulting JSON dictionary
 static func getJSON(code: String) -> Dictionary:
 	var result = {"start": null, "beats": {}}
@@ -152,8 +180,8 @@ static func getJSON(code: String) -> Dictionary:
 			var call = parse_call(code, pos)
 			match call[0]:
 				"const":
-					check_arg_count(call, 1)
-					consts[call[0]] = call[1]
+					check_arg_count(call, 2)
+					consts[call[1]] = call[2]
 					pos = advance_until(code, pos, ">") + 1
 				"import":
 					# TODO: Implement constant importing
@@ -229,7 +257,7 @@ static func getJSON(code: String) -> Dictionary:
 					pos = advance_until(code, pos, ">") + 1
 		else:
 			var new_pos = advance_until_enter(code, pos)
-			var line = code.substr(pos, new_pos - pos)
+			var line = replace_consts(code.substr(pos, new_pos - pos), consts)
 			var line_info = get_line_info(line)
 			
 			check_beat(line, current_beat)
