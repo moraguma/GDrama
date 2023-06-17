@@ -89,13 +89,13 @@ func next_line() -> Dictionary:
 						result["choices"][i] = replace_commands(result["choices"][i])
 						
 						var condition = GDramaTranspiler.parse_call(result["conditions"][i], 0)
-						result["conditions"][i] = callv(condition[0], condition.slice(1))
+						result["conditions"][i] = to_call.callv(condition[0], condition.slice(1))
 				"END":
 					result = line
 					result["info"] = replace_commands(result["info"])
 				"CALL":
 					var call = GDramaTranspiler.parse_call(line["call"], 0)
-					callv(call[0], call.slice(1))
+					to_call.callv(call[0], call.slice(1))
 		return result
 	return {}
 
@@ -109,7 +109,7 @@ func replace_commands(s: String) -> String:
 			var command = GDramaTranspiler.parse_call(s, pos)
 			var new_pos = GDramaTranspiler.advance_until(s, pos, "}")
 			
-			s = s.substr(0, pos) + callv(command[0], command.slice(1)) + s.substr(new_pos + 1)
+			s = s.substr(0, pos) + to_call.callv(command[0], command.slice(1)) + s.substr(new_pos + 1)
 		pos = GDramaTranspiler.advance_until(s, pos, "{")
 	
 	return s
