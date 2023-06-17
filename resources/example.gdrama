@@ -1,10 +1,19 @@
-<const "x" "y">
+<beat Start>
+    Tom: Hey! (wait 0.5)Over here!(wave)
+    Tom: This is an example scene
+    Tom: [wave]What do you think?
 
-<beat "Test">
-    Tom: Hi!
-    Tom: This is a test scene
-    Tom: You can use DramaReader level commands with {test "This sintax!"}
-    Tom: You can add acting commands... (wait 1.0)like this!
-    You can also write text not linked to an author
-    
+    <choice "I like it!" Like>
+    <choice "Not a huge fan" Dislike>
 
+<beat Like>
+    Tom: Well, I'm glad!
+    <jump End>
+
+<beat Dislike>
+    Tom: That's a shame
+    <jump End>
+
+<beat End>
+    Tom: Anyway, I have to go
+    <end "Regular ending">

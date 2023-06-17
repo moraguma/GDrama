@@ -2,7 +2,7 @@ class_name GDramaTranspiler
 
 
 const CLOSERS = {"\"": "\"", "{": "}", "<": ">", "\'": "\'"}
-const EMPTY = [" ", "\t", "\n"]
+const EMPTY = [" "]
 
 
 static func remove_from_string(s: String, pos: int) -> String:
@@ -63,15 +63,44 @@ static func parse_call(call_string: String, pos: int) -> Array[String]:
 # Advances empty spaces in s starting from pos until pos is at a non-empty
 # character
 static func advance_empty_spaces(s: String, pos: int) -> int:
-	while s[pos] in EMPTY:
+	if pos >= len(s):
+		return pos
+	
+	var empty = [PackedByteArray([0]), PackedByteArray([0]), PackedByteArray([0])]
+	empty[0].encode_u8(0, 32) # Space
+	empty[1].encode_u8(0, 13) # Carriage return
+	empty[2].encode_u8(0, 10) # Line feed
+	
+	while s[pos].to_utf8_buffer() in empty:
 		pos += 1
+		if pos >= len(s):
+			break
 	return pos
 
 
 # Advances spaces in s starting from pos until pos is at x
 static func advance_until(s: String, pos: int, x: String) -> int:
+	if pos >= len(s):
+		return pos
+	
 	while s[pos] != x:
 		pos += 1
+		if pos >= len(s):
+			break
+	return pos
+
+# Advances spaces in s starting from pos until pos is at \n
+static func advance_until_enter(s: String, pos: int) -> int:
+	if pos >= len(s):
+		return pos
+	
+	var enter = PackedByteArray([0])
+	enter.encode_u8(0, 10)
+	
+	while s[pos].to_utf8_buffer() != enter:
+		pos += 1
+		if pos >= len(s):
+			break
 	return pos
 
 
@@ -111,7 +140,7 @@ static func get_line_info(s: String) -> Array[String]:
 
 
 # Given a GDrama code, returns its resulting JSON dictionary
-static func getJSON(code: String):
+static func getJSON(code: String) -> Dictionary:
 	var result = {"start": null, "beats": {}}
 	var consts = {}
 	
@@ -157,7 +186,7 @@ static func getJSON(code: String):
 					check_arg_count(call, 1)
 					check_beat(" ".join(call), current_beat)
 					
-					result["beats"][current_beat]["steps"][str(current_step)] = {"type": "CALL", "call": call[1]}
+					result["beats"][current_beat]["steps"][str(current_step)] = {"type": "CALL", "call": "{jump " + call[1] + "}"}
 					current_step += 1
 					
 					pos = advance_until(code, pos, ">") + 1
@@ -199,7 +228,7 @@ static func getJSON(code: String):
 					
 					pos = advance_until(code, pos, ">") + 1
 		else:
-			var new_pos = advance_until(code, pos, "\n")
+			var new_pos = advance_until_enter(code, pos)
 			var line = code.substr(pos, new_pos - pos)
 			var line_info = get_line_info(line)
 			
@@ -210,3 +239,4 @@ static func getJSON(code: String):
 			
 			pos = new_pos
 		pos = advance_empty_spaces(code, pos)
+	return result
