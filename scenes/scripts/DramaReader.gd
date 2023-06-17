@@ -14,8 +14,9 @@ func _init(to_call: Object = self):
 
 # Loads and parses a .drama file. If successful, the drama and pointer variables
 # are updated 
-func load_drama(path: String) -> void:
-	pass
+func load_gdrama(path: String) -> void:
+	drama = GDramaTranspiler.get_json(FileAccess.open(path, FileAccess.READ).get_as_text())
+	jump(drama["start"])
 
 
 # Loads a .json file obtained from parsing a .drama file. If successful, the
