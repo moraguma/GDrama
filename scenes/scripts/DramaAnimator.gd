@@ -4,13 +4,15 @@ class_name DramaAnimator
 
 var animation_player: AnimationPlayer
 var label: RichTextLabel
-var to_call: Object
+var to_call: Node
+var scene_root: Node
 
 
-func _init(animation_player: AnimationPlayer, label: RichTextLabel, to_call: Object):
+func _init(animation_player: AnimationPlayer, label: RichTextLabel, to_call: Node, scene_root: Node):
 	self.animation_player = animation_player
 	self.label = label
 	self.to_call = to_call
+	self.scene_root = scene_root
 
 
 # Returns a DramaAnimation created from the given string
@@ -52,6 +54,7 @@ func create_drama_animation(s: String) -> DramaAnimation:
 			pos = new_pos + 1
 	
 	drama_animation.raw_text = raw_text
+	label.text = raw_text
 	
 	assign_paths(drama_animation)
 	
@@ -65,9 +68,9 @@ func assign_paths(drama_animation: DramaAnimation) -> void:
 	var method_path = ""
 	if animation_player != null:
 		if label != null:
-			value_path = str(animation_player.get_path_to(label)) + ":visible_characters"
+			value_path = str(scene_root.get_path_to(label)) + ":visible_characters"
 		if to_call != null:
-			method_path = str(animation_player.get_path_to(to_call))
+			method_path = str(scene_root.get_path_to(to_call))
 	
 	drama_animation.assign_paths(value_path, method_path)
 

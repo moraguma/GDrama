@@ -12,7 +12,7 @@ func _ready():
 	drama_reader = DramaReader.new()
 	drama_reader.load_gdrama("res://resources/example.gdrama")
 	
-	drama_animator = DramaAnimator.new(animation_player, label, self)
+	drama_animator = DramaAnimator.new(animation_player, label, self, self)
 	
 	next_line()
 
@@ -27,6 +27,15 @@ func next_line():
 	
 	animation_player.remove_animation_library("t")
 	var anim_lib = AnimationLibrary.new()
-	anim_lib.add_animation("t", drama_animator.create_drama_animation(line["direction"]))
+	anim_lib.add_animation("t1", drama_animator.create_drama_animation(line["direction"]))
+	print(anim_lib.has_animation("t1"))
 	animation_player.add_animation_library("t", anim_lib)
-	animation_player.play("t")
+	animation_player.play("t/t1")
+	
+	var anim: Animation = animation_player.get_animation("t/t1")
+	var d = {}
+	for track in range(anim.get_track_count()):
+		d[track] = {"path": anim.track_get_path(track), "keys": []}
+		for key in range(anim.track_get_key_count(track)):
+			d[track]["keys"].append(anim.track_get_key_time(track, key))
+	print(d)
