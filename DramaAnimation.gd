@@ -56,11 +56,11 @@ func assign_paths(value_path: NodePath, method_path: NodePath) -> void:
 
 
 # Sets time_per_char. Effectively, changes the talking speed
-func speed(time) -> void:
+func speed(time: String) -> void:
 	time_per_char = float(time)
 
 
 # Adds to the current_time. Effectively, creates a pause in the animation
-func wait(time) -> void:
-	current_time += time
+func wait(time: String) -> void:
+	current_time += float(time)
 	add_text_keyframe(current_pos)

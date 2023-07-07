@@ -9,6 +9,7 @@ script = ExtResource("1_yqhf6")
 offset_top = 416.0
 offset_right = 1152.0
 offset_bottom = 593.0
+bbcode_enabled = true
 text = "asdasdasdasdasd"
 
 [node name="Button" type="Button" parent="."]

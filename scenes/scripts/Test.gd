@@ -27,15 +27,18 @@ func next_line():
 	
 	animation_player.remove_animation_library("t")
 	var anim_lib = AnimationLibrary.new()
-	anim_lib.add_animation("t1", drama_animator.create_drama_animation(line["direction"]))
+	var anim: DramaAnimation = drama_animator.create_drama_animation(line["direction"])
+	anim_lib.add_animation("t1", anim)
 	print(anim_lib.has_animation("t1"))
 	animation_player.add_animation_library("t", anim_lib)
+	
+	label.text = "[center]" + anim.raw_text
 	animation_player.play("t/t1")
 	
-	var anim: Animation = animation_player.get_animation("t/t1")
+	var a: Animation = animation_player.get_animation("t/t1")
 	var d = {}
-	for track in range(anim.get_track_count()):
-		d[track] = {"path": anim.track_get_path(track), "keys": []}
-		for key in range(anim.track_get_key_count(track)):
+	for track in range(a.get_track_count()):
+		d[track] = {"path": a.track_get_path(track), "keys": []}
+		for key in range(a.track_get_key_count(track)):
 			d[track]["keys"].append(anim.track_get_key_time(track, key))
 	print(d)

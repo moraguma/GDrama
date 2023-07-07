@@ -39,7 +39,7 @@ func create_drama_animation(s: String) -> DramaAnimation:
 	while pos < len(s):
 		var old_pos = pos
 		pos = GDramaTranspiler.advance_until(s, pos, "(")
-		text_pos += pos - old_pos - 1
+		text_pos += pos - old_pos
 		
 		drama_animation.add_text_keyframe(text_pos)
 		
@@ -54,7 +54,6 @@ func create_drama_animation(s: String) -> DramaAnimation:
 			pos = new_pos + 1
 	
 	drama_animation.raw_text = raw_text
-	label.text = raw_text
 	
 	assign_paths(drama_animation)
 	

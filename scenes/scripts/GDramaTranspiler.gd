@@ -4,7 +4,7 @@ extends Resource
 class_name GDramaTranspiler
 
 
-const CLOSERS = {"\"": "\"", "{": "}", "<": ">", "\'": "\'"}
+const CLOSERS = {"\"": "\"", "{": "}", "<": ">", "\'": "\'", "(": ")"}
 const EMPTY = [" "]
 
 
