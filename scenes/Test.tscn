@@ -1,24 +1,28 @@
-[gd_scene load_steps=2 format=3 uid="uid://u0s51x523lxt"]
+[gd_scene load_steps=3 format=3 uid="uid://u0s51x523lxt"]
 
 [ext_resource type="Script" path="res://scenes/scripts/Test.gd" id="1_yqhf6"]
+[ext_resource type="PackedScene" uid="uid://y0u25vtclgsf" path="res://scenes/DramaAnimationPlayer.tscn" id="2_l0nhv"]
 
 [node name="Test" type="Node"]
+
+[node name="Node" type="Node" parent="."]
 script = ExtResource("1_yqhf6")
 
-[node name="RichTextLabel" type="RichTextLabel" parent="."]
+[node name="RichTextLabel" type="RichTextLabel" parent="Node"]
 offset_top = 416.0
 offset_right = 1152.0
 offset_bottom = 593.0
 bbcode_enabled = true
 text = "asdasdasdasdasd"
 
-[node name="Button" type="Button" parent="."]
+[node name="Button" type="Button" parent="Node"]
 offset_left = 76.0
 offset_top = 204.0
 offset_right = 274.0
 offset_bottom = 304.0
 text = "Next"
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+[node name="DramaAnimationPlayer" parent="Node" instance=ExtResource("2_l0nhv")]
+root_node = NodePath("../..")
 
-[connection signal="pressed" from="Button" to="." method="next_line"]
+[connection signal="pressed" from="Node/Button" to="Node" method="next_line"]

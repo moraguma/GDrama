@@ -5,14 +5,12 @@ class_name DramaAnimator
 var animation_player: AnimationPlayer
 var label: RichTextLabel
 var to_call: Node
-var scene_root: Node
 
 
-func _init(animation_player: AnimationPlayer, label: RichTextLabel, to_call: Node, scene_root: Node):
+func _init(animation_player: AnimationPlayer, label: RichTextLabel, to_call: Node):
 	self.animation_player = animation_player
 	self.label = label
 	self.to_call = to_call
-	self.scene_root = scene_root
 
 
 # Returns a DramaAnimation created from the given string
@@ -66,10 +64,17 @@ func assign_paths(drama_animation: DramaAnimation) -> void:
 	var value_path = ""
 	var method_path = ""
 	if animation_player != null:
+		# TODO: Fix the path. This version works very inconsistently when the
+		# user changes the scene root
+		var root = animation_player.get_tree().root
+		var effective_root = animation_player
+		while effective_root.get_parent() != root:
+			effective_root = effective_root.get_parent()
+		
 		if label != null:
-			value_path = str(scene_root.get_path_to(label)) + ":visible_characters"
+			value_path = str(effective_root.get_path_to(label)) + ":visible_characters"
 		if to_call != null:
-			method_path = str(scene_root.get_path_to(to_call))
+			method_path = str(effective_root.get_path_to(to_call))
 	
 	drama_animation.assign_paths(value_path, method_path)
 
