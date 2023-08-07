@@ -141,6 +141,6 @@ Commands wrapped up in () are processed only by the DramaAnimator. As such, the 
 
 These values will not be touched at all by GDrama. These commands can be used for injecting BBCode in direction when it is being used in conjunction with the RichTextLabel
 
-### \# - Comments
+## Copyright
 
-Everything after # in a line is ignored
+Copyright/attribution is not required, though appreciated. Credit me as Moraguma and link to https://moraguma.itch.io/
