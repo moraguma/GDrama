@@ -20,7 +20,7 @@ func _init(to_call: Object = self):
 # Loads and parses a .drama file. If successful, the drama and pointer variables
 # are updated 
 func load_gdrama(path: String) -> void:
-	drama = GDramaTranspiler.get_json(FileAccess.open(path, FileAccess.READ).get_as_text())
+	drama = GoDramaTranspiler.get_json(FileAccess.open(path, FileAccess.READ).get_as_text())
 	jump(drama["start"])
 
 
@@ -88,13 +88,13 @@ func next_line() -> Dictionary:
 					for i in range(len(result["choices"])):
 						result["choices"][i] = replace_commands(result["choices"][i])
 						
-						var condition = GDramaTranspiler.parse_call(result["conditions"][i], 0)
+						var condition = GoDramaTranspiler.parse_call(result["conditions"][i], 0)
 						result["conditions"][i] = to_call.callv(condition[0], condition.slice(1))
 				"END":
 					result = line
 					result["info"] = replace_commands(result["info"])
 				"CALL":
-					var call = GDramaTranspiler.parse_call(line["call"], 0)
+					var call = GoDramaTranspiler.parse_call(line["call"], 0)
 					to_call.callv(call[0], call.slice(1))
 		return result
 	return {}
@@ -106,11 +106,11 @@ func replace_commands(s: String) -> String:
 	
 	while pos < len(s):
 		if s[pos] == "{" and s[max(pos - 1, 0)] != "\\":
-			var command = GDramaTranspiler.parse_call(s, pos)
-			var new_pos = GDramaTranspiler.advance_until(s, pos, "}")
+			var command = GoDramaTranspiler.parse_call(s, pos)
+			var new_pos = GoDramaTranspiler.advance_until(s, pos, "}")
 			
 			s = s.substr(0, pos) + to_call.callv(command[0], command.slice(1)) + s.substr(new_pos + 1)
-		pos = GDramaTranspiler.advance_until(s, pos, "{")
+		pos = GoDramaTranspiler.advance_until(s, pos, "{")
 	
 	return s
 

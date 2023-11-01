@@ -1,7 +1,7 @@
 extends Resource
 
 
-class_name GDramaTranspiler
+class_name GoDramaTranspiler
 
 
 const CLOSERS = {"\"": "\"", "{": "}", "<": ">", "\'": "\'", "(": ")"}

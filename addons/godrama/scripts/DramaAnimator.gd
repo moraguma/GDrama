@@ -21,10 +21,10 @@ func create_drama_animation(s: String) -> DramaAnimation:
 	
 	#while pos + 1 < len(raw_text):
 	#	if raw_text[pos] == "(" and raw_text[max(pos - 1, 0)] != "\\":
-	#		var new_pos = GDramaTranspiler.advance_until(raw_text, pos, ")")
+	#		var new_pos = GoDramaTranspiler.advance_until(raw_text, pos, ")")
 	#		
 	#		raw_text = raw_text.substr(0, pos) + raw_text.substr(new_pos + 1)
-	#	pos = GDramaTranspiler.advance_until(raw_text, pos, "(")
+	#	pos = GoDramaTranspiler.advance_until(raw_text, pos, "(")
 	
 	# Animation
 	var drama_animation = get_new_drama_animation()
@@ -36,14 +36,14 @@ func create_drama_animation(s: String) -> DramaAnimation:
 	
 	while pos < len(s):
 		var old_pos = pos
-		pos = GDramaTranspiler.advance_until(s, pos, "(")
+		pos = GoDramaTranspiler.advance_until(s, pos, "(")
 		text_pos += pos - old_pos
 		
 		drama_animation.add_text_keyframe(text_pos)
 		
 		if s[min(len(s) - 1, pos)] == "(" and s[max(0, pos - 1)] != "\\":
-			var call = GDramaTranspiler.parse_call(s, pos)
-			var new_pos = GDramaTranspiler.advance_until(s, pos, ")")
+			var call = GoDramaTranspiler.parse_call(s, pos)
+			var new_pos = GoDramaTranspiler.advance_until(s, pos, ")")
 			
 			raw_text = raw_text.substr(0, text_pos) + s.substr(new_pos + 1)
 			
