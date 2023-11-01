@@ -4,26 +4,24 @@
 [ext_resource type="Script" path="res://addons/godrama/scripts/DramaAnimator.gd" id="2_0ghnq"]
 
 [node name="Test" type="Node"]
-
-[node name="Node" type="Node" parent="."]
 script = ExtResource("1_yqhf6")
 
-[node name="RichTextLabel" type="RichTextLabel" parent="Node"]
+[node name="RichTextLabel" type="RichTextLabel" parent="."]
 offset_top = 416.0
 offset_right = 1152.0
 offset_bottom = 593.0
 bbcode_enabled = true
 text = "asdasdasdasdasd"
 
-[node name="Button" type="Button" parent="Node"]
+[node name="Button" type="Button" parent="."]
 offset_left = 76.0
 offset_top = 204.0
 offset_right = 274.0
 offset_bottom = 304.0
 text = "Next"
 
-[node name="DramaAnimator" type="Node" parent="Node" node_paths=PackedStringArray("label")]
+[node name="DramaAnimator" type="Node" parent="." node_paths=PackedStringArray("label")]
 script = ExtResource("2_0ghnq")
 label = NodePath("../RichTextLabel")
 
-[connection signal="pressed" from="Node/Button" to="Node" method="next_line"]
+[connection signal="pressed" from="Button" to="." method="next_line"]

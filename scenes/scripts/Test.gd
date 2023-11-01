@@ -20,4 +20,8 @@ func next_line():
 		drama_reader.make_choice(0)
 		line = drama_reader.next_line()
 	
-	drama_animator.animate(line["direction"])
+	if line["type"] == "END":
+		$Button.hide()
+		$RichTextLabel.hide()
+	else:
+		drama_animator.animate(line["direction"])
