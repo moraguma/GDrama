@@ -1,7 +1,7 @@
 extends Node
 
 
-@onready var drama_animation_player: DramaAnimationPlayer = $DramaAnimationPlayer
+@onready var drama_animator: DramaAnimator = $DramaAnimator
 @onready var label = $RichTextLabel
 var drama_reader: DramaReader
 
@@ -10,8 +10,6 @@ var drama_reader: DramaReader
 func _ready():
 	drama_reader = DramaReader.new()
 	drama_reader.load_gdrama("res://resources/example.gdrama")
-	
-	drama_animation_player.label = label
 	
 	next_line()
 
@@ -22,4 +20,4 @@ func next_line():
 		drama_reader.make_choice(0)
 		line = drama_reader.next_line()
 	
-	label.text = drama_animation_player.play_drama(line["direction"])
+	drama_animator.animate(line["direction"])

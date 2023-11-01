@@ -1,85 +1,96 @@
-extends Resource
+extends Node
 class_name DramaAnimator
 
 
-var animation_player: AnimationPlayer
-var label: RichTextLabel
-var to_call: Node
+# ------------------------------------------------------------------------------
+# SIGNALS
+# ------------------------------------------------------------------------------
+signal done # Emitted when dialogue finishes naturally
+signal spoke # Emitted when a letter is turned visible
+
+# ------------------------------------------------------------------------------
+# VARIABLES
+# ------------------------------------------------------------------------------
+var is_typing = false
+var time_per_char: float = 0.015
+
+# ------------------------------------------------------------------------------
+# NODES
+# ------------------------------------------------------------------------------
+@export var label: RichTextLabel
+var text_timer: Timer
+var animation_timer: Timer
 
 
-func _init(animation_player: AnimationPlayer, label: RichTextLabel, to_call: Node):
-	self.animation_player = animation_player
-	self.label = label
-	self.to_call = to_call
+func _ready():
+	text_timer = Timer.new()
+	add_child(text_timer)
+	animation_timer = Timer.new()
+	add_child(animation_timer)
 
 
-# Returns a DramaAnimation created from the given string
-func create_drama_animation(s: String) -> DramaAnimation:
-	# Text processing 
-	#var raw_text = s
-	#var pos = 0
+# Animates the given string. Uses the label to display text if it's available
+func animate(s: String):
+	is_typing = true
 	
-	#while pos + 1 < len(raw_text):
-	#	if raw_text[pos] == "(" and raw_text[max(pos - 1, 0)] != "\\":
-	#		var new_pos = GoDramaTranspiler.advance_until(raw_text, pos, ")")
-	#		
-	#		raw_text = raw_text.substr(0, pos) + raw_text.substr(new_pos + 1)
-	#	pos = GoDramaTranspiler.advance_until(raw_text, pos, "(")
-	
-	# Animation
-	var drama_animation = get_new_drama_animation()
-	
-	var pos = 0
-	var text_pos = 0
-	
+	# Generates steps as a list of texts and calls
+	var steps = []
 	var raw_text = s
+	var pos = 0
 	
-	while pos < len(s):
-		var old_pos = pos
-		pos = GoDramaTranspiler.advance_until(s, pos, "(")
-		text_pos += pos - old_pos
-		
-		drama_animation.add_text_keyframe(text_pos)
-		
-		if s[min(len(s) - 1, pos)] == "(" and s[max(0, pos - 1)] != "\\":
-			var call = GoDramaTranspiler.parse_call(s, pos)
-			var new_pos = GoDramaTranspiler.advance_until(s, pos, ")")
+	while pos < len(raw_text):
+		if raw_text[pos] == "(" and raw_text[max(pos - 1, 0)] != "\\":
+			var call = GoDramaTranspiler.parse_call(raw_text, pos)
+			steps.append({"type": "CALL", "call": call})
 			
-			raw_text = raw_text.substr(0, text_pos) + s.substr(new_pos + 1)
+			if len(steps) >= 2: # Removes empty text if present
+				if steps[-2]["type"] == "TEXT":
+					if steps[-2]["size"] == 0:
+						steps.remove_at(len(steps) - 2)
 			
-			drama_animation.add_method_keyframe(call)
-			
-			pos = new_pos + 1
-	
-	drama_animation.raw_text = raw_text
-	
-	assign_paths(drama_animation)
-	
-	return drama_animation
-
-
-# Assigns paths to the provided DramaAnimation according to the label, to_call
-# and animation_player nodes
-func assign_paths(drama_animation: DramaAnimation) -> void:
-	var value_path = ""
-	var method_path = ""
-	if animation_player != null:
-		# TODO: Fix the path. This version works very inconsistently when the
-		# user changes the scene root
-		var root = animation_player.get_tree().root
-		var effective_root = animation_player
-		while effective_root.get_parent() != root:
-			effective_root = effective_root.get_parent()
+			raw_text = raw_text.substr(0, pos) + raw_text.substr(GoDramaTranspiler.advance_until(raw_text, pos, ")") + 1)
 		
-		if label != null:
-			value_path = str(root.get_path_to(label)) + ":visible_characters"
-		if to_call != null:
-			method_path = str(root.get_path_to(to_call))
+		var new_pos = GoDramaTranspiler.advance_until(raw_text, pos, "(")
+		steps.append({"type": "TEXT", "size": new_pos - pos})
+		pos = new_pos
 	
-	drama_animation.assign_paths(value_path, method_path)
+	if label != null:
+		label.text = raw_text
+		label.visible_characters = 0
+	
+	# Animates calls and texts
+	var step_pos = 0
+	var current_step = 0
+	while current_step < len(steps):
+		match steps[current_step]["type"]:
+			"CALL":
+				await callv(steps[current_step]["call"][0], steps[current_step]["call"].slice(1))
+			"TEXT":
+				if is_typing:
+					var text_pos = 0
+					while text_pos < steps[current_step]["size"]:
+						if label != null:
+							label.visible_characters += 1
+						
+						text_timer.start(time_per_char)
+						await text_timer.timeout
+						if not is_typing:
+							break
+						
+						text_pos += 1
+		current_step += 1
+	
+	is_typing = false
+	done.emit()
 
 
-# Returns a new DramaAnimation object. Can be overwritten in extended functions
-# to return an object that inherits from DramaAnimation
-func get_new_drama_animation() -> DramaAnimation:
-	return DramaAnimation.new()
+# Sets time_per_char. Effectively, changes the talking speed
+func speed(time: String) -> void:
+	time_per_char = float(time)
+
+
+# Creates a pause in the animation
+func wait(time: String) -> void:
+	if is_typing:
+		text_timer.start(float(time))
+		await text_timer.timeout

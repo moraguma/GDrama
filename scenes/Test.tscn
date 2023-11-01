@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://u0s51x523lxt"]
 
 [ext_resource type="Script" path="res://scenes/scripts/Test.gd" id="1_yqhf6"]
-[ext_resource type="Script" path="res://addons/godrama/scripts/DramaAnimationPlayer.gd" id="2_ass6i"]
+[ext_resource type="Script" path="res://addons/godrama/scripts/DramaAnimator.gd" id="2_0ghnq"]
 
 [node name="Test" type="Node"]
 
@@ -22,7 +22,8 @@ offset_right = 274.0
 offset_bottom = 304.0
 text = "Next"
 
-[node name="DramaAnimationPlayer" type="AnimationPlayer" parent="Node"]
-script = ExtResource("2_ass6i")
+[node name="DramaAnimator" type="Node" parent="Node" node_paths=PackedStringArray("label")]
+script = ExtResource("2_0ghnq")
+label = NodePath("../RichTextLabel")
 
 [connection signal="pressed" from="Node/Button" to="Node" method="next_line"]
