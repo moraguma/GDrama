@@ -72,9 +72,9 @@ func assign_paths(drama_animation: DramaAnimation) -> void:
 			effective_root = effective_root.get_parent()
 		
 		if label != null:
-			value_path = str(effective_root.get_path_to(label)) + ":visible_characters"
+			value_path = str(root.get_path_to(label)) + ":visible_characters"
 		if to_call != null:
-			method_path = str(effective_root.get_path_to(to_call))
+			method_path = str(root.get_path_to(to_call))
 	
 	drama_animation.assign_paths(value_path, method_path)
 

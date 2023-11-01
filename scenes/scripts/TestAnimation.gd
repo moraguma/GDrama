@@ -1,8 +1,8 @@
 extends Node2D
 
 
-@onready var animation_player = $Node/Node/AnimationPlayer
-@onready var rich_text_label = $Node/Node/RichTextLabel
+@onready var animation_player = $AnimationPlayer
+@onready var rich_text_label = $RichTextLabel
 
 
 func _ready():

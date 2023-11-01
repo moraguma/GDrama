@@ -1,14 +1,13 @@
-[gd_scene load_steps=6 format=3 uid="uid://b340ill1wjrq2"]
+[gd_scene load_steps=5 format=3 uid="uid://b340ill1wjrq2"]
 
 [ext_resource type="Script" path="res://scenes/scripts/TestAnimation.gd" id="1_lfl7m"]
-[ext_resource type="Script" path="res://scenes/scripts/TestAnimation2.gd" id="2_54ywb"]
 
 [sub_resource type="Animation" id="Animation_dc0wf"]
 length = 0.001
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("Node/Node/RichTextLabel:visible_ratio")
+tracks/0/path = NodePath("Node/TestAnimation/RichTextLabel:visible_ratio")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -21,31 +20,31 @@ tracks/0/keys = {
 [sub_resource type="Animation" id="Animation_x0ocl"]
 resource_name = "test"
 length = 3.0
-tracks/0/type = "value"
+tracks/0/type = "method"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("Node/Node/RichTextLabel:visible_ratio")
+tracks/0/path = NodePath("Node/TestAnimation")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 3),
-"transitions": PackedFloat32Array(1, 1),
-"update": 0,
-"values": [0.0, 1.0]
-}
-tracks/1/type = "method"
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/path = NodePath(".")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/keys = {
 "times": PackedFloat32Array(3),
 "transitions": PackedFloat32Array(1),
 "values": [{
 "args": [],
 "method": &"test"
 }]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Node/TestAnimation/RichTextLabel:visible_ratio")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 3),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.0, 1.0]
 }
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_rju0v"]
@@ -54,21 +53,18 @@ _data = {
 "test": SubResource("Animation_x0ocl")
 }
 
-[node name="TestAnimation" type="Node2D"]
+[node name="Node" type="Node2D"]
+
+[node name="TestAnimation" type="Node2D" parent="."]
 script = ExtResource("1_lfl7m")
 
-[node name="Node" type="Node" parent="."]
-script = ExtResource("2_54ywb")
-
-[node name="Node" type="Node" parent="Node"]
-
-[node name="AnimationPlayer" type="AnimationPlayer" parent="Node/Node"]
+[node name="AnimationPlayer" type="AnimationPlayer" parent="TestAnimation"]
 root_node = NodePath("../../..")
 libraries = {
 "": SubResource("AnimationLibrary_rju0v")
 }
 
-[node name="RichTextLabel" type="RichTextLabel" parent="Node/Node"]
+[node name="RichTextLabel" type="RichTextLabel" parent="TestAnimation"]
 offset_left = 195.0
 offset_top = 165.0
 offset_right = 951.0

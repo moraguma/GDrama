@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://u0s51x523lxt"]
 
 [ext_resource type="Script" path="res://scenes/scripts/Test.gd" id="1_yqhf6"]
-[ext_resource type="PackedScene" uid="uid://y0u25vtclgsf" path="res://scenes/DramaAnimationPlayer.tscn" id="2_l0nhv"]
+[ext_resource type="Script" path="res://addons/gdrama/scripts/DramaAnimationPlayer.gd" id="2_cwtno"]
 
 [node name="Test" type="Node"]
 
@@ -22,7 +22,7 @@ offset_right = 274.0
 offset_bottom = 304.0
 text = "Next"
 
-[node name="DramaAnimationPlayer" parent="Node" instance=ExtResource("2_l0nhv")]
-root_node = NodePath("../..")
+[node name="DramaAnimationPlayer" type="AnimationPlayer" parent="Node"]
+script = ExtResource("2_cwtno")
 
 [connection signal="pressed" from="Node/Button" to="Node" method="next_line"]
