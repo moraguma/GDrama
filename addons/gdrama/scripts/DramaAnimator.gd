@@ -1,3 +1,4 @@
+@icon("res://addons/gdrama/icons/DramaAnimator.png")
 extends Node
 class_name DramaAnimator
 
@@ -7,6 +8,7 @@ class_name DramaAnimator
 # ------------------------------------------------------------------------------
 signal done # Emitted when dialogue finishes naturally
 signal spoke # Emitted when a letter is turned visible
+signal call(func_name: String, args: Array) # Emitted when a function is called
 
 # ------------------------------------------------------------------------------
 # VARIABLES
@@ -40,7 +42,7 @@ func animate(s: String):
 	
 	while pos < len(raw_text):
 		if raw_text[pos] == "(" and raw_text[max(pos - 1, 0)] != "\\":
-			var call = GoDramaTranspiler.parse_call(raw_text, pos)
+			var call = GDramaTranspiler.parse_call(raw_text, pos)
 			steps.append({"type": "CALL", "call": call})
 			
 			if len(steps) >= 2: # Removes empty text if present
@@ -48,9 +50,9 @@ func animate(s: String):
 					if steps[-2]["size"] == 0:
 						steps.remove_at(len(steps) - 2)
 			
-			raw_text = raw_text.substr(0, pos) + raw_text.substr(GoDramaTranspiler.advance_until(raw_text, pos, ")") + 1)
+			raw_text = raw_text.substr(0, pos) + raw_text.substr(GDramaTranspiler.advance_until(raw_text, pos, ")") + 1)
 		
-		var new_pos = GoDramaTranspiler.advance_until(raw_text, pos, "(")
+		var new_pos = GDramaTranspiler.advance_until(raw_text, pos, "(")
 		steps.append({"type": "TEXT", "size": new_pos - pos})
 		pos = new_pos
 	
@@ -84,7 +86,7 @@ func animate(s: String):
 	done.emit()
 
 # ------------------------------------------------------------------------------
-# GODRAMA METHODS
+# GDRAMA METHODS
 # ------------------------------------------------------------------------------
 
 # Sets time_per_char. Effectively, changes the talking speed
