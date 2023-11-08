@@ -83,6 +83,9 @@ func animate(s: String):
 	is_typing = false
 	done.emit()
 
+# ------------------------------------------------------------------------------
+# GODRAMA METHODS
+# ------------------------------------------------------------------------------
 
 # Sets time_per_char. Effectively, changes the talking speed
 func speed(time: String) -> void:
