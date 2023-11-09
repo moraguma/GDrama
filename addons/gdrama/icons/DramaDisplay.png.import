@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c3jusmv86if8i"
-path="res://.godot/imported/DramaAnimationPlayer.png-86f6a5930e5ed13f3b484bd485fb9695.ctex"
+uid="uid://cb8x8fi1soks6"
+path="res://.godot/imported/DramaDisplay.png-c6688e7d5f719ad4b74f723c16ceb7c8.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://addons/gdrama/icons/DramaAnimationPlayer.png"
-dest_files=["res://.godot/imported/DramaAnimationPlayer.png-86f6a5930e5ed13f3b484bd485fb9695.ctex"]
+source_file="res://addons/gdrama/icons/DramaDisplay.png"
+dest_files=["res://.godot/imported/DramaDisplay.png-c6688e7d5f719ad4b74f723c16ceb7c8.ctex"]
 
 [params]
 
