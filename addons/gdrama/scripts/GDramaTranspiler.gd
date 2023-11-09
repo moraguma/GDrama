@@ -92,6 +92,9 @@ static func get_json(code: String) -> Dictionary:
 					current_step += 1
 					
 					pos = advance_until(code, pos, ">") + 1
+				_:
+					push_error("Unrecognized command " + call[0])
+					return {}
 		else:
 			var new_pos = advance_until_enter(code, pos)
 			var line = replace_consts(code.substr(pos, new_pos - pos), consts)

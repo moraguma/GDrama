@@ -10,6 +10,9 @@ class_name DramaAnimator
 ## Emitted when dialogue finishes
 signal direction_ended
 
+## Emitted when dialogue is skipped
+signal skipped
+
 ## Emits the raw text of a direction when it has been processed
 signal set_raw_text(raw_text: String)
 
@@ -101,10 +104,12 @@ func animate(s: String):
 
 
 func skip_animation():
-	is_typing = false
-	
-	text_timer.timeout.emit()
-	text_timer.stop()
+	if is_typing:
+		skipped.emit()
+		is_typing = false
+		
+		text_timer.timeout.emit()
+		text_timer.stop()
 
 # ------------------------------------------------------------------------------
 # GDRAMA METHODS

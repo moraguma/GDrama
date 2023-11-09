@@ -30,6 +30,7 @@ const MAX_ANGLE = 0.2
 # VARIABLES
 # --------------------------------------------------------------------------------------------------
 @export var texture_path: String
+@export var actor_name: String
 
 # Movement ---------------------------------------------------------------------
 var dir: Vector2 = Vector2(0, 0)
@@ -43,11 +44,14 @@ var effective_gravity = GRAVITY_WEIGHT
 # --------------------------------------------------------------------------------------------------
 @onready var animation_player = $AnimationPlayer
 @onready var sprite = $Sprite
+@onready var drama_display: ExampleDramaDisplay = $ExampleDramaDisplay.get_drama_display()
 
 # --------------------------------------------------------------------------------------------------
 # BUILT-INS
 # --------------------------------------------------------------------------------------------------
 func _ready():
+	drama_display.actor_name = actor_name
+	
 	sprite.texture = load(texture_path)
 
 

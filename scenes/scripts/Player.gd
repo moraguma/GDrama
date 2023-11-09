@@ -28,7 +28,9 @@ func _input_process():
 	
 	if Input.is_action_just_pressed("talk") and cutscene != null:
 		take_control()
-		cutscene.play_cutscene(self)
+		await move_h(cutscene.position[0] - position[0])
+		await cutscene.play_cutscene(self)
+		return_control()
 
 
 func take_control():
@@ -47,5 +49,6 @@ func enter_cutscene_area(area):
 
 
 func exit_cutscene_area(area):
-	cutscene.hide_trigger()
-	cutscene = null
+	if cutscene != null:
+		cutscene.hide_trigger()
+		cutscene = null

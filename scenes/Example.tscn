@@ -1,9 +1,10 @@
-[gd_scene load_steps=9 format=3 uid="uid://e2xapuns3dmk"]
+[gd_scene load_steps=10 format=3 uid="uid://e2xapuns3dmk"]
 
 [ext_resource type="Texture2D" uid="uid://b1j2cmx1b6sa7" path="res://resources/sprites/tilesets/tilemap_packed.png" id="1_ce6c0"]
 [ext_resource type="Texture2D" uid="uid://bsnne10xy7pqh" path="res://resources/sprites/tilesets/tilemap-backgrounds_packed.png" id="1_etbxs"]
 [ext_resource type="PackedScene" uid="uid://d5cvmsn1l0rb" path="res://scenes/Player.tscn" id="2_k8vpn"]
 [ext_resource type="PackedScene" uid="uid://dj48qo23ili87" path="res://scenes/CutsceneTrigger.tscn" id="4_rt7g7"]
+[ext_resource type="PackedScene" uid="uid://p8v6t6buk0ge" path="res://scenes/Character.tscn" id="5_ondmo"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_btk8d"]
 texture = ExtResource("1_etbxs")
@@ -272,7 +273,19 @@ layer_1/tile_data = PackedInt32Array()
 [node name="Player" parent="." instance=ExtResource("2_k8vpn")]
 position = Vector2(216, 792)
 texture_path = "res://resources/sprites/Player.png"
+actor_name = "You"
 
-[node name="CutsceneTrigger" parent="." instance=ExtResource("4_rt7g7")]
-position = Vector2(792, 864)
-gdrama_path = "res://resources/example.gdrama"
+[node name="CutsceneTrigger" parent="." node_paths=PackedStringArray("characters") instance=ExtResource("4_rt7g7")]
+position = Vector2(1152, 864)
+gdrama_path = "res://resources/dramas/example.gdrama"
+characters = [NodePath("../Talky")]
+
+[node name="Talky" parent="." instance=ExtResource("5_ondmo")]
+position = Vector2(1656, 792)
+texture_path = "res://resources/sprites/Talky.png"
+actor_name = "Talky"
+
+[node name="Sprite" parent="Talky" index="0"]
+flip_h = true
+
+[editable path="Talky"]

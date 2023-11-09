@@ -1,7 +1,8 @@
-[gd_scene load_steps=9 format=3 uid="uid://p8v6t6buk0ge"]
+[gd_scene load_steps=10 format=3 uid="uid://p8v6t6buk0ge"]
 
 [ext_resource type="Script" path="res://scenes/scripts/Character.gd" id="1_uc1gm"]
 [ext_resource type="Texture2D" uid="uid://dweoiradnaxsj" path="res://resources/sprites/Player.png" id="2_qxeo3"]
+[ext_resource type="PackedScene" uid="uid://c3246ey0wa38t" path="res://scenes/ExampleDramaDisplay.tscn" id="3_0h27p"]
 
 [sub_resource type="Animation" id="Animation_635k8"]
 length = 0.001
@@ -86,3 +87,6 @@ shape = SubResource("CapsuleShape2D_nbie2")
 [node name="FeetShape" type="CollisionShape2D" parent="."]
 position = Vector2(0, 72)
 shape = SubResource("RectangleShape2D_gl3ok")
+
+[node name="ExampleDramaDisplay" parent="." instance=ExtResource("3_0h27p")]
+position = Vector2(0, -100)

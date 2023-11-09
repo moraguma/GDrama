@@ -6,7 +6,7 @@
 [ext_resource type="PackedScene" uid="uid://dbo7yp520fsvd" path="res://scenes/DialogueBubble.tscn" id="3_arucu"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_q1rl2"]
-radius = 72.0
+radius = 288.0
 
 [node name="CutsceneTrigger" type="Node2D"]
 script = ExtResource("1_23bnr")
@@ -22,4 +22,4 @@ shape = SubResource("CircleShape2D_q1rl2")
 debug_color = Color(0.470588, 0.443137, 1, 0.419608)
 
 [node name="Bubble" parent="." instance=ExtResource("3_arucu")]
-position = Vector2(0, -216)
+position = Vector2(0, -172)
