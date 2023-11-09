@@ -1,6 +1,7 @@
-[gd_scene load_steps=3 format=3 uid="uid://u0s51x523lxt"]
+[gd_scene load_steps=4 format=3 uid="uid://u0s51x523lxt"]
 
 [ext_resource type="Script" path="res://scenes/scripts/Test.gd" id="1_yqhf6"]
+[ext_resource type="Script" path="res://addons/gdrama/scripts/DramaDisplay.gd" id="3_114r3"]
 [ext_resource type="Script" path="res://addons/gdrama/scripts/DramaPlayer.gd" id="3_dm342"]
 
 [node name="Test" type="Node"]
@@ -19,6 +20,10 @@ offset_top = 204.0
 offset_right = 274.0
 offset_bottom = 304.0
 text = "Next"
+
+[node name="DramaDisplay" type="Node" parent="." node_paths=PackedStringArray("drama_player")]
+script = ExtResource("3_114r3")
+drama_player = NodePath("../DramaPlayer")
 
 [node name="DramaPlayer" type="Node" parent="."]
 script = ExtResource("3_dm342")

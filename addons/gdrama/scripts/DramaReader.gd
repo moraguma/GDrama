@@ -61,7 +61,14 @@ func make_choice(choice: int) -> void:
 			else:
 				push_error("Invalid choice " + str(choice) + " at line " + JSON.stringify(line))
 		else:
-			push_error("Current line" + JSON.stringify(line) + "is not a choice!")
+			push_error("Current line " + JSON.stringify(line) + " is not a choice!")
+
+
+func reset_drama():
+	if drama != null:
+		jump(drama["start"])
+	else:
+		push_error("Tried to reset drama with no drama loaded!")
 
 
 # Returns the next line and advances the pointer by one. The return is given in

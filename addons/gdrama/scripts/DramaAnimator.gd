@@ -3,32 +3,38 @@ extends Node
 class_name DramaAnimator
 
 
-# ------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------------------
 # SIGNALS
-# ------------------------------------------------------------------------------
-signal done # Emitted when dialogue finishes naturally
-signal spoke # Emitted when a letter is turned visible
-signal call(func_name: String, args: Array) # Emitted when a function is called
+# --------------------------------------------------------------------------------------------------
 
-# ------------------------------------------------------------------------------
+## Emitted when dialogue finishes
+signal direction_ended
+
+## Emits the raw text of a direction when it has been processed
+signal set_raw_text(raw_text: String)
+
+## Emitted when a letter is meant to have been turned visible
+signal spoke(letter: String)
+
+## Emitted when a drama call is made, regardless of whether or not it has been
+## handled by this node
+signal drama_call(func_name: String, args: Array)
+
+# --------------------------------------------------------------------------------------------------
 # VARIABLES
-# ------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------------------
 var is_typing = false
 var time_per_char: float = 0.015
 
 # ------------------------------------------------------------------------------
 # NODES
 # ------------------------------------------------------------------------------
-@export var label: RichTextLabel
 var text_timer: Timer
-var animation_timer: Timer
 
 
 func _ready():
 	text_timer = Timer.new()
 	add_child(text_timer)
-	animation_timer = Timer.new()
-	add_child(animation_timer)
 
 
 # Animates the given string. Uses the label to display text if it's available
@@ -56,34 +62,49 @@ func animate(s: String):
 		steps.append({"type": "TEXT", "size": new_pos - pos})
 		pos = new_pos
 	
-	if label != null:
-		label.text = raw_text
-		label.visible_characters = 0
+	set_raw_text.emit(raw_text)
 	
 	# Animates calls and texts
+	var total_pos = 0
 	var step_pos = 0
 	var current_step = 0
 	while current_step < len(steps):
 		match steps[current_step]["type"]:
 			"CALL":
-				await callv(steps[current_step]["call"][0], steps[current_step]["call"].slice(1))
+				var method_name = steps[current_step]["call"][0]
+				var args = steps[current_step]["call"].slice(1)
+				
+				drama_call.emit(args)
+				if has_method(method_name):
+					if is_typing:
+						await callv(method_name, args)
+					else:
+						callv(method_name, args)
 			"TEXT":
 				if is_typing:
 					var text_pos = 0
 					while text_pos < steps[current_step]["size"]:
-						if label != null:
-							label.visible_characters += 1
+						spoke.emit(raw_text[total_pos])
 						
-						text_timer.start(time_per_char)
-						await text_timer.timeout
-						if not is_typing:
-							break
+						if time_per_char > 0:
+							text_timer.start(time_per_char)
+							await text_timer.timeout
+							if not is_typing:
+								break
 						
 						text_pos += 1
+						total_pos += 1
 		current_step += 1
 	
 	is_typing = false
-	done.emit()
+	direction_ended.emit()
+
+
+func skip_animation():
+	is_typing = false
+	
+	text_timer.timeout.emit()
+	text_timer.stop()
 
 # ------------------------------------------------------------------------------
 # GDRAMA METHODS
