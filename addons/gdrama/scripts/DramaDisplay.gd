@@ -3,36 +3,6 @@
 extends Node
 class_name DramaDisplay
 
-
-# --------------------------------------------------------------------------------------------------
-# VARIABLES
-# --------------------------------------------------------------------------------------------------
-## The DramaPlayer that this node should animate
-@export var drama_player: DramaPlayer:
-	set(value):
-		drama_player = value
-		update_configuration_warnings()
-
-
-# --------------------------------------------------------------------------------------------------
-# BUILT-INS
-# --------------------------------------------------------------------------------------------------
-func _get_configuration_warnings():
-	if drama_player == null:
-		return ["DramaPlayer not set"]
-	return []
-
-
-func _ready():
-	drama_player.direction_ended.connect(_direction_ended)
-	drama_player.set_raw_text.connect(_set_raw_text)
-	drama_player.spoke.connect(_spoke)
-	drama_player.drama_call.connect(_drama_call)
-	drama_player.ask_for_choice.connect(_ask_for_choice)
-	drama_player.set_actor.connect(_set_actor)
-	drama_player.ended_drama.connect(_ended_drama)
-
-
 # --------------------------------------------------------------------------------------------------
 # INHERITABLES
 # --------------------------------------------------------------------------------------------------

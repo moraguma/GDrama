@@ -1,0 +1,8 @@
+[gd_resource type="Theme" load_steps=2 format=3 uid="uid://kgkrtpvr80cq"]
+
+[ext_resource type="FontFile" uid="uid://dc0vefpbebp5q" path="res://resources/fonts/born2bsporty-fs/Born2bSportyFS.otf" id="1_4g412"]
+
+[resource]
+default_font = ExtResource("1_4g412")
+default_font_size = 48
+RichTextLabel/colors/default_color = Color(0.141176, 0.14902, 0.14902, 1)

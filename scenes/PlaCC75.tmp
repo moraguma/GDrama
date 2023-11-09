@@ -1,0 +1,102 @@
+[gd_scene load_steps=10 format=3 uid="uid://d5cvmsn1l0rb"]
+
+[ext_resource type="Script" path="res://scenes/scripts/Player.gd" id="1_abdv4"]
+[ext_resource type="Texture2D" uid="uid://dweoiradnaxsj" path="res://resources/sprites/Player.png" id="2_dls6b"]
+
+[sub_resource type="Animation" id="Animation_tmox1"]
+resource_name = "idle"
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [1]
+}
+
+[sub_resource type="Animation" id="Animation_635k8"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [1]
+}
+
+[sub_resource type="Animation" id="Animation_rjr7r"]
+resource_name = "move"
+length = 0.4
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 1,
+"values": [0, 1, 2, 3]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_dnlj3"]
+_data = {
+"RESET": SubResource("Animation_635k8"),
+"idle": SubResource("Animation_tmox1"),
+"move": SubResource("Animation_rjr7r")
+}
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_nbie2"]
+radius = 48.0
+height = 144.0
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_gl3ok"]
+size = Vector2(96, 48)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_llm25"]
+radius = 96.0
+
+[node name="Player" type="CharacterBody2D"]
+z_index = 1
+collision_layer = 2
+script = ExtResource("1_abdv4")
+
+[node name="Sprite" type="Sprite2D" parent="."]
+texture_filter = 1
+texture = ExtResource("2_dls6b")
+hframes = 4
+frame = 1
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_dnlj3")
+}
+
+[node name="BodyShape" type="CollisionShape2D" parent="."]
+position = Vector2(0, 24)
+shape = SubResource("CapsuleShape2D_nbie2")
+
+[node name="FeetShape" type="CollisionShape2D" parent="."]
+position = Vector2(0, 72)
+shape = SubResource("RectangleShape2D_gl3ok")
+
+[node name="CutsceneArea" type="Area2D" parent="."]
+
+[node name="Hitbox" type="CollisionShape2D" parent="CutsceneArea"]
+shape = SubResource("CircleShape2D_llm25")
+debug_color = Color(0.470588, 0.443137, 1, 0.419608)
+
+[connection signal="area_entered" from="CutsceneArea" to="." method="enter_cutscene_area"]
+[connection signal="area_exited" from="CutsceneArea" to="." method="exit_cutscene_area"]

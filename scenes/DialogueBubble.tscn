@@ -1,0 +1,19 @@
+[gd_scene load_steps=3 format=3 uid="uid://dbo7yp520fsvd"]
+
+[ext_resource type="Theme" uid="uid://kgkrtpvr80cq" path="res://resources/themes/MainTheme.tres" id="1_cdmfc"]
+[ext_resource type="Script" path="res://scenes/scripts/DialogueBubble.gd" id="1_w3516"]
+
+[node name="DialogueBubble" type="Polygon2D"]
+texture_filter = 1
+polygon = PackedVector2Array(198, -54, 216, -45, 225, -27, 225, -18, 216, 0, 198, 9, 9, 9, 0, 18, -9, 9, -198, 9, -216, 0, -225, -18, -225, -27, -216, -45, -198, -54)
+script = ExtResource("1_w3516")
+
+[node name="Text" type="RichTextLabel" parent="."]
+custom_minimum_size = Vector2(0, 54)
+offset_left = -216.0
+offset_top = -54.0
+offset_right = 216.0
+theme = ExtResource("1_cdmfc")
+bbcode_enabled = true
+text = "[center]Dialogue!"
+fit_content = true

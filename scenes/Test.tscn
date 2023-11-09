@@ -21,9 +21,8 @@ offset_right = 274.0
 offset_bottom = 304.0
 text = "Next"
 
-[node name="DramaDisplay" type="Node" parent="." node_paths=PackedStringArray("drama_player")]
+[node name="DramaDisplay" type="Node" parent="."]
 script = ExtResource("3_114r3")
-drama_player = NodePath("../DramaPlayer")
 
 [node name="DramaPlayer" type="Node" parent="."]
 script = ExtResource("3_dm342")

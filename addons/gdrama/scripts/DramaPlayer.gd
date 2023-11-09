@@ -49,12 +49,45 @@ func _get_configuration_warnings():
 
 
 func _ready():
-	drama_reader.load_gdrama(gdrama_path)
+	if gdrama_path != "":
+		load_gdrama(gdrama_path)
 
 
 # --------------------------------------------------------------------------------------------------
 # METHODS
 # --------------------------------------------------------------------------------------------------
+func load_gdrama(path: String):
+	drama_reader.load_gdrama(path)
+
+## Connects the signals emitted by this node to the respective functions in the
+## given DramaDisplay
+func connect_display(display: DramaDisplay):
+	direction_ended.connect(display._direction_ended)
+	set_raw_text.connect(display._set_raw_text)
+	spoke.connect(display._spoke)
+	drama_call.connect(display._drama_call)
+	ask_for_choice.connect(display._ask_for_choice)
+	set_actor.connect(display._set_actor)
+	ended_drama.connect(display._ended_drama)
+
+
+## Disconnects signal from given DramaDisplay
+func disconnect_display(display: DramaDisplay):
+	direction_ended.disconnect(display._direction_ended)
+	set_raw_text.disconnect(display._set_raw_text)
+	spoke.disconnect(display._spoke)
+	drama_call.disconnect(display._drama_call)
+	ask_for_choice.disconnect(display._ask_for_choice)
+	set_actor.disconnect(display._set_actor)
+	ended_drama.disconnect(display._ended_drama)
+
+
+## Disconnects all connected DramaDisplays. Can be called at the end of a scene
+func disconnect_displays():
+	for s in [direction_ended, set_raw_text, spoke, drama_call, ask_for_choice, set_actor, ended_drama]:
+		for c in s.get_connections():
+			s.disconnect(c["callable"])
+
 
 ## Should be called when the drama is supposed to start playing
 func start_drama():

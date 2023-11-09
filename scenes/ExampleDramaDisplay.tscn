@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://c3246ey0wa38t"]
+
+[ext_resource type="Script" path="res://addons/gdrama/scripts/DramaDisplay.gd" id="1_wtxtk"]
+
+[node name="ExampleDramaDisplay" type="Node"]
+script = ExtResource("1_wtxtk")
