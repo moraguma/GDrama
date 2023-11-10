@@ -3,7 +3,7 @@
 [ext_resource type="Texture2D" uid="uid://b1j2cmx1b6sa7" path="res://resources/sprites/tilesets/tilemap_packed.png" id="1_ce6c0"]
 [ext_resource type="Texture2D" uid="uid://bsnne10xy7pqh" path="res://resources/sprites/tilesets/tilemap-backgrounds_packed.png" id="1_etbxs"]
 [ext_resource type="PackedScene" uid="uid://d5cvmsn1l0rb" path="res://scenes/Player.tscn" id="2_k8vpn"]
-[ext_resource type="PackedScene" uid="uid://dj48qo23ili87" path="res://scenes/CutsceneTrigger.tscn" id="4_rt7g7"]
+[ext_resource type="PackedScene" uid="uid://by6uku18lw8d0" path="res://scenes/AreaDramaInterface.tscn" id="5_0m6jn"]
 [ext_resource type="PackedScene" uid="uid://p8v6t6buk0ge" path="res://scenes/Character.tscn" id="5_ondmo"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_btk8d"]
@@ -275,11 +275,6 @@ position = Vector2(216, 792)
 texture_path = "res://resources/sprites/Player.png"
 actor_name = "You"
 
-[node name="CutsceneTrigger" parent="." node_paths=PackedStringArray("characters") instance=ExtResource("4_rt7g7")]
-position = Vector2(1152, 864)
-gdrama_path = "res://resources/dramas/example.gdrama"
-characters = [NodePath("../Talky")]
-
 [node name="Talky" parent="." instance=ExtResource("5_ondmo")]
 position = Vector2(1656, 792)
 texture_path = "res://resources/sprites/Talky.png"
@@ -287,5 +282,11 @@ actor_name = "Talky"
 
 [node name="Sprite" parent="Talky" index="0"]
 flip_h = true
+
+[node name="AreaDramaInterface" parent="." node_paths=PackedStringArray("intro_drama_display", "drama_displays") instance=ExtResource("5_0m6jn")]
+position = Vector2(1440, 864)
+intro_drama_display = NodePath("../Talky/BubbleDramaDisplay")
+drama_displays = [NodePath("../Talky/BubbleDramaDisplay")]
+gdrama_path = "res://resources/dramas/example.gdrama"
 
 [editable path="Talky"]

@@ -11,7 +11,7 @@ signal landed
 # CONSTANTS
 # --------------------------------------------------------------------------------------------------
 # Movement ---------------------------------------------------------------------
-const H_MOVE_TOLERANCE = 40.0
+const H_MOVE_TOLERANCE = 10.0
 
 const SPEED = 300.0
 const JUMP_SPEED = 800.0
@@ -24,7 +24,7 @@ const GRAVITY_WEIGHT = 0.03
 
 # Animation --------------------------------------------------------------------
 const MOVE_ANIM_TOLERANCE = 50.0
-const MAX_ANGLE = 0.2
+const MAX_ANGLE = 0.1
 
 # --------------------------------------------------------------------------------------------------
 # VARIABLES
@@ -44,7 +44,7 @@ var effective_gravity = GRAVITY_WEIGHT
 # --------------------------------------------------------------------------------------------------
 @onready var animation_player = $AnimationPlayer
 @onready var sprite = $Sprite
-@onready var drama_display: ExampleDramaDisplay = $ExampleDramaDisplay.get_drama_display()
+@onready var drama_display: BubbleDramaDisplay = $BubbleDramaDisplay
 
 # --------------------------------------------------------------------------------------------------
 # BUILT-INS

@@ -6,7 +6,7 @@ const FLOATY_GRAVITY_WEIGHT = 0.015
 
 
 var controllable = true
-var cutscene: CutsceneTrigger = null
+var drama_interface: AreaDramaInterface = null
 
 
 func _physics_process(delta):
@@ -26,10 +26,14 @@ func _input_process():
 	else:
 		effective_gravity = GRAVITY_WEIGHT
 	
-	if Input.is_action_just_pressed("talk") and cutscene != null:
+	if Input.is_action_just_pressed("talk") and drama_interface != null:
 		take_control()
-		await move_h(cutscene.position[0] - position[0])
-		await cutscene.play_cutscene(self)
+		await move_h(drama_interface.position[0] - position[0])
+		
+		drama_interface.drama_player.connect_display(drama_display)
+		await drama_interface.play_drama()
+		drama_interface.drama_player.disconnect_display(drama_display)
+		
 		return_control()
 
 
@@ -44,11 +48,11 @@ func return_control():
 
 
 func enter_cutscene_area(area):
-	cutscene = area.get_cutscene_trigger()
-	cutscene.display_trigger()
+	drama_interface = area.get_parent()
+	drama_interface.display_trigger()
 
 
 func exit_cutscene_area(area):
-	if cutscene != null:
-		cutscene.hide_trigger()
-		cutscene = null
+	if drama_interface != null:
+		drama_interface.hide_trigger()
+		drama_interface = null

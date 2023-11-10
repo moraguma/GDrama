@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://scenes/scripts/Character.gd" id="1_uc1gm"]
 [ext_resource type="Texture2D" uid="uid://dweoiradnaxsj" path="res://resources/sprites/Player.png" id="2_qxeo3"]
-[ext_resource type="PackedScene" uid="uid://c3246ey0wa38t" path="res://scenes/ExampleDramaDisplay.tscn" id="3_0h27p"]
+[ext_resource type="PackedScene" uid="uid://b316yvhfet7b3" path="res://scenes/BubbleDramaDisplay.tscn" id="3_7y6n5"]
 
 [sub_resource type="Animation" id="Animation_635k8"]
 length = 0.001
@@ -67,6 +67,7 @@ height = 144.0
 size = Vector2(96, 48)
 
 [node name="Character" type="CharacterBody2D"]
+collision_layer = 2
 script = ExtResource("1_uc1gm")
 
 [node name="Sprite" type="Sprite2D" parent="."]
@@ -88,5 +89,5 @@ shape = SubResource("CapsuleShape2D_nbie2")
 position = Vector2(0, 72)
 shape = SubResource("RectangleShape2D_gl3ok")
 
-[node name="ExampleDramaDisplay" parent="." instance=ExtResource("3_0h27p")]
-position = Vector2(0, -100)
+[node name="BubbleDramaDisplay" parent="." instance=ExtResource("3_7y6n5")]
+position = Vector2(0, -99)

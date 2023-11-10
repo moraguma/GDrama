@@ -1,25 +1,29 @@
-[gd_scene load_steps=4 format=3 uid="uid://dbo7yp520fsvd"]
+[gd_scene load_steps=4 format=3 uid="uid://b316yvhfet7b3"]
 
-[ext_resource type="Theme" uid="uid://kgkrtpvr80cq" path="res://resources/themes/MainTheme.tres" id="1_cdmfc"]
-[ext_resource type="Script" path="res://scenes/scripts/DialogueBubble.gd" id="1_w3516"]
+[ext_resource type="Script" path="res://scenes/scripts/BubbleDramaDisplay.gd" id="1_a7heo"]
+[ext_resource type="Theme" uid="uid://kgkrtpvr80cq" path="res://resources/themes/MainTheme.tres" id="3_uk74w"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_m6eke"]
 
-[node name="DialogueBubble" type="Polygon2D"]
+[node name="BubbleDramaDisplay" type="Node2D"]
+texture_filter = 1
+script = ExtResource("1_a7heo")
+
+[node name="Bubble" type="Polygon2D" parent="."]
 texture_filter = 1
 material = SubResource("ShaderMaterial_m6eke")
 polygon = PackedVector2Array(198, -54, 216, -45, 225, -27, 225, -18, 216, 0, 198, 9, 9, 9, 0, 18, -9, 9, -198, 9, -216, 0, -225, -18, -225, -27, -216, -45, -198, -54)
-script = ExtResource("1_w3516")
 
 [node name="Text" type="RichTextLabel" parent="."]
 custom_minimum_size = Vector2(0, 54)
 offset_left = -216.0
 offset_top = -54.0
 offset_right = 216.0
-theme = ExtResource("1_cdmfc")
+theme = ExtResource("3_uk74w")
 bbcode_enabled = true
-text = "[center]Dialogue!"
+text = "[center]Dialogue!da asd asd asddasdasdasdasdasda"
 fit_content = true
+metadata/_edit_use_anchors_ = true
 
 [node name="Actor" type="RichTextLabel" parent="."]
 custom_minimum_size = Vector2(0, 54)
@@ -28,12 +32,13 @@ offset_top = -63.0
 offset_right = -46.0
 offset_bottom = -9.0
 rotation = -0.174533
-theme = ExtResource("1_cdmfc")
+theme = ExtResource("3_uk74w")
 theme_override_colors/default_color = Color(1, 1, 1, 1)
 theme_override_colors/font_outline_color = Color(0.141176, 0.14902, 0.14902, 1)
 theme_override_constants/outline_size = 16
 bbcode_enabled = true
 fit_content = true
+metadata/_edit_use_anchors_ = true
 
 [node name="Next" type="Polygon2D" parent="."]
 visible = false
