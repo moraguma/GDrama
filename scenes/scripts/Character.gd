@@ -12,6 +12,8 @@ signal landed
 # --------------------------------------------------------------------------------------------------
 # Movement ---------------------------------------------------------------------
 const H_MOVE_TOLERANCE = 10.0
+const SCAMPER_AMPLITUDE = 100.0
+const FLIP_TOLERANCE = 10.0
 
 const SPEED = 450.0
 const JUMP_SPEED = 1000.0
@@ -33,8 +35,13 @@ const MAX_ANGLE = 0.1
 @export var actor_name: String
 
 # Movement ---------------------------------------------------------------------
+var scampering = false
+var scamper_base_pos
+
 var dir: Vector2 = Vector2(0, 0)
 var aim_h
+var pre_scamper_flip_h = false
+var queue_flip_h
 var on_floor = true
 
 var effective_gravity = GRAVITY_WEIGHT
@@ -104,7 +111,11 @@ func _animation_process():
 		animation_player.play("idle")
 	
 	# Flips sprite depending on direction
-	if velocity[0] > 0:
+	if abs(velocity[0]) < FLIP_TOLERANCE:
+		if queue_flip_h != null:
+			sprite.flip_h = queue_flip_h
+			queue_flip_h = null
+	elif velocity[0] > 0:
 		sprite.flip_h = false
 	elif velocity[0] < 0:
 		sprite.flip_h = true
@@ -131,3 +142,22 @@ func jump():
 	if is_on_floor():
 		velocity += Vector2(0, -1) * JUMP_SPEED
 		await landed
+
+
+func scamper():
+	if not scampering:
+		scampering = true
+		pre_scamper_flip_h = sprite.flip_h
+		scamper_base_pos = position[0]
+		
+		var dir = 1
+		while scampering:
+			await move_h(scamper_base_pos + dir * SCAMPER_AMPLITUDE - position[0])
+			dir *= -1
+
+
+func stop_scamper():
+	if scampering:
+		scampering = false
+		await move_h(scamper_base_pos - position[0])
+		queue_flip_h = pre_scamper_flip_h

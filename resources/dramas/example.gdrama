@@ -8,6 +8,9 @@ Talky: EU TÔ FALANDO COISA AINDA AINDA AINDA MAIORES!!! OLHA EU QUANTAS PALAVRI
 
 <beat Op1>
 Talky: Você escolheu a Op1
+Talky: (scamper Talky)Adoooooro... eu adooooooooooooooooooooooooooooooooro correr por aí eu acho uma maravilha
+Talky: Tão bom.... tão bom correr.....
+Talky: Ok... (wait 1.0)(stop_scamper Talky)Ok, parei
 <end "1">
 
 <beat Op2>

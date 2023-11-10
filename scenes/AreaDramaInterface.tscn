@@ -13,3 +13,6 @@ script = ExtResource("1_pohsf")
 [node name="Hitbox" type="CollisionShape2D" parent="Area"]
 shape = SubResource("CircleShape2D_6wgr8")
 debug_color = Color(0.470588, 0.443137, 1, 0.419608)
+
+[node name="StandingPos" type="Node2D" parent="."]
+position = Vector2(0, -192)

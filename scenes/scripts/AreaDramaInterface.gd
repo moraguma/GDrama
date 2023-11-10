@@ -1,8 +1,10 @@
 extends DramaInterface2D
 class_name AreaDramaInterface
 
+@onready var standing_pos: Vector2 = position + $StandingPos.position
 
 @export var intro_drama_display: BubbleDramaDisplay
+@export var look_left = false
 
 
 func display_trigger():

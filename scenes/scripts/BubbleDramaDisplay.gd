@@ -2,6 +2,10 @@ extends DramaDisplay2D
 class_name BubbleDramaDisplay
 
 
+signal no_calls
+signal ended_processing
+
+
 const LOWER_VERTICES = [3, 4, 5, 6, 7, 8, 9, 10, 11]
 const LINE_SIZE = 54
 const SCALING_WEIGHT = 0.15
@@ -10,6 +14,8 @@ const SCALING_WEIGHT = 0.15
 @export var actor_name: String
 
 
+var active_calls = 0
+
 var showing = false
 var active = false
 var base_lower_vertice_pos = []
@@ -17,6 +23,7 @@ var current_choice_values
 var current_choice_data
 var current_choice
 
+@onready var char: Character = get_parent()
 
 @onready var base_pos = position
 @onready var bubble: Polygon2D = $Bubble
@@ -124,6 +131,10 @@ func _set_actor(actor: String):
 ## Deactivates regardless of state once drama has ended
 func _ended_drama(info: String):
 	deactivate()
+	
+	if active_calls > 0:
+		await no_calls
+	ended_processing.emit()
 
 
 # --------------------------------------------------------------------------------------------------
@@ -189,3 +200,24 @@ func erase_bbcode(t: String):
 		else:
 			pos += 1
 	return t
+
+
+# --------------------------------------------------------------------------------------------------
+# GDRAMA COMMANDS
+# --------------------------------------------------------------------------------------------------
+func finish_call():
+	active_calls -= 1
+	if active_calls == 0:
+		no_calls.emit()
+
+
+func scamper(actor: String):
+	if actor_name == actor:
+		active_calls += 1
+		await char.scamper()
+		finish_call()
+
+
+func stop_scamper(actor: String):
+	if actor_name == actor:
+		char.stop_scamper()

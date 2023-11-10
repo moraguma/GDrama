@@ -20,7 +20,7 @@ signal spoke(letter: String)
 
 ## Emitted when a drama call is made, regardless of whether or not it has been
 ## handled by this node
-signal drama_call(func_name: String, args: Array)
+signal drama_call(method_name: String, args: Array)
 
 # --------------------------------------------------------------------------------------------------
 # VARIABLES
@@ -76,7 +76,7 @@ func animate(s: String):
 				var method_name = steps[current_step]["call"][0]
 				var args = steps[current_step]["call"].slice(1)
 				
-				drama_call.emit(args)
+				drama_call.emit(method_name, args)
 				if has_method(method_name):
 					if is_typing:
 						await callv(method_name, args)
