@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bgmxebi1x5euo"
-path="res://.godot/imported/DramaPlayer.png-5a0aed964df79cdf4e5ca22ebea0d60e.ctex"
+uid="uid://diugmdgm6847s"
+path="res://.godot/imported/DramaDisplay3D.svg-070a563a0afff26239bd22b7df51b129.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://addons/gdrama/icons/DramaPlayer.png"
-dest_files=["res://.godot/imported/DramaPlayer.png-5a0aed964df79cdf4e5ca22ebea0d60e.ctex"]
+source_file="res://addons/gdrama/icons/svg/DramaDisplay3D.svg"
+dest_files=["res://.godot/imported/DramaDisplay3D.svg-070a563a0afff26239bd22b7df51b129.ctex"]
 
 [params]
 
@@ -32,3 +32,6 @@ process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
 detect_3d/compress_to=1
+svg/scale=1.0
+editor/scale_with_editor_scale=false
+editor/convert_colors_with_editor_theme=false
