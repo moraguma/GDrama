@@ -2,6 +2,12 @@
 extends Node3D
 class_name DramaDisplay3D
 
+
+## The DramaPlayer this display is currently connected to. Changed by connection
+## methods in DramaPlayer
+var drama_player: DramaPlayer
+
+
 # --------------------------------------------------------------------------------------------------
 # INHERITABLES
 # --------------------------------------------------------------------------------------------------
@@ -29,8 +35,9 @@ func _spoke(letter: String):
 
 ## Will be emited when the GDrama calls for a function. Can be used to implement
 ## specific functions, such as changing a character's mood
-func _drama_call(func_name: String, args: Array):
-	pass
+func _drama_call(method_name: String, args: Array):
+	if has_method(method_name):
+		callv(method_name, args)
 
 ## Will be emited when the GDrama expects a choice to be made. Should display
 ## the available options to the player and, once one has been chosen, pass that

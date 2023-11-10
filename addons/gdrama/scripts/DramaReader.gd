@@ -89,16 +89,15 @@ func next_line() -> Dictionary:
 					pointer = str(int(pointer) + 1)
 					
 					result = replace_commands_in_fields(line, ["actor", "direction"])
-					
 				"CHOICE":
-					result = line
+					result = line.duplicate(true)
 					for i in range(len(result["choices"])):
 						result["choices"][i] = replace_commands(result["choices"][i])
 						
 						var condition = GDramaTranspiler.parse_call(result["conditions"][i], 0)
 						result["conditions"][i] = to_call.callv(condition[0], condition.slice(1))
 				"END":
-					result = line
+					result = line.duplicate(true)
 					result["info"] = replace_commands(result["info"])
 				"CALL":
 					var call = GDramaTranspiler.parse_call(line["call"], 0)

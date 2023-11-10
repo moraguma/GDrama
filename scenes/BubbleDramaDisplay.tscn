@@ -44,3 +44,12 @@ metadata/_edit_use_anchors_ = true
 visible = false
 color = Color(0.141176, 0.14902, 0.14902, 1)
 polygon = PackedVector2Array(207, -9, 234, 9, 207, 27)
+
+[node name="Right" type="Polygon2D" parent="."]
+visible = false
+polygon = PackedVector2Array(232, -44, 244, -22, 232, 0, 280, -22)
+
+[node name="Left" type="Polygon2D" parent="."]
+visible = false
+scale = Vector2(-1, 1)
+polygon = PackedVector2Array(232, -44, 244, -22, 232, 0, 280, -22)

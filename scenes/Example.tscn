@@ -272,8 +272,6 @@ layer_1/tile_data = PackedInt32Array()
 
 [node name="Player" parent="." instance=ExtResource("2_k8vpn")]
 position = Vector2(216, 792)
-texture_path = "res://resources/sprites/Player.png"
-actor_name = "You"
 
 [node name="Talky" parent="." instance=ExtResource("5_ondmo")]
 position = Vector2(1656, 792)

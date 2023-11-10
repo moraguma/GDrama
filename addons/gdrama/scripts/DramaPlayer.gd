@@ -26,6 +26,7 @@ signal ended_drama(info: String)
 # VARIABLES
 # --------------------------------------------------------------------------------------------------
 @onready var drama_reader: DramaReader = DramaReader.new()
+var connected_displays: Array = []
 
 
 # --------------------------------------------------------------------------------------------------
@@ -37,33 +38,42 @@ func load_gdrama(path: String):
 ## Connects the signals emitted by this node to the respective functions in the
 ## given DramaDisplay
 func connect_display(display):
-	skipped.connect(display._skipped)
-	direction_ended.connect(display._direction_ended)
-	set_raw_text.connect(display._set_raw_text)
-	spoke.connect(display._spoke)
-	drama_call.connect(display._drama_call)
-	ask_for_choice.connect(display._ask_for_choice)
-	set_actor.connect(display._set_actor)
-	ended_drama.connect(display._ended_drama)
+	if not display in connected_displays:
+		connected_displays.append(display)
+		
+		skipped.connect(display._skipped)
+		direction_ended.connect(display._direction_ended)
+		set_raw_text.connect(display._set_raw_text)
+		spoke.connect(display._spoke)
+		drama_call.connect(display._drama_call)
+		ask_for_choice.connect(display._ask_for_choice)
+		set_actor.connect(display._set_actor)
+		ended_drama.connect(display._ended_drama)
+		
+		display.drama_player = self
 
 
 ## Disconnects signal from given DramaDisplay
 func disconnect_display(display):
-	skipped.disconnect(display._skipped)
-	direction_ended.disconnect(display._direction_ended)
-	set_raw_text.disconnect(display._set_raw_text)
-	spoke.disconnect(display._spoke)
-	drama_call.disconnect(display._drama_call)
-	ask_for_choice.disconnect(display._ask_for_choice)
-	set_actor.disconnect(display._set_actor)
-	ended_drama.disconnect(display._ended_drama)
+	if display in connected_displays:
+		connected_displays.erase(display)
+		
+		skipped.disconnect(display._skipped)
+		direction_ended.disconnect(display._direction_ended)
+		set_raw_text.disconnect(display._set_raw_text)
+		spoke.disconnect(display._spoke)
+		drama_call.disconnect(display._drama_call)
+		ask_for_choice.disconnect(display._ask_for_choice)
+		set_actor.disconnect(display._set_actor)
+		ended_drama.disconnect(display._ended_drama)
+		
+		display.drama_player = null
 
 
 ## Disconnects all connected DramaDisplays. Can be called at the end of a scene
 func disconnect_displays():
-	for s in [skipped, direction_ended, set_raw_text, spoke, drama_call, ask_for_choice, set_actor, ended_drama]:
-		for c in s.get_connections():
-			s.disconnect(c["callable"])
+	while len(connected_displays) > 0:
+		disconnect_display(connected_displays[0])
 
 
 ## Should be called when the drama is supposed to start playing

@@ -73,6 +73,8 @@ radius = 96.0
 z_index = 1
 collision_layer = 2
 script = ExtResource("1_abdv4")
+texture_path = "res://resources/sprites/Player.png"
+actor_name = "You"
 
 [node name="Sprite" type="Sprite2D" parent="."]
 texture_filter = 1

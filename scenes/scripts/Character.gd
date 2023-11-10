@@ -13,13 +13,13 @@ signal landed
 # Movement ---------------------------------------------------------------------
 const H_MOVE_TOLERANCE = 10.0
 
-const SPEED = 300.0
-const JUMP_SPEED = 800.0
-const TERMINAL_FALL_SPEED = 1200.0
+const SPEED = 450.0
+const JUMP_SPEED = 1000.0
+const TERMINAL_FALL_SPEED = 1800.0
 
 const AIR_ACCEL = 0.05
 const GROUND_ACCEL = 0.1
-const GROUND_DECEL = 0.3
+const GROUND_DECEL = 0.2
 const GRAVITY_WEIGHT = 0.03
 
 # Animation --------------------------------------------------------------------
@@ -68,7 +68,7 @@ func _movement_process(delta):
 			landed.emit()
 			on_floor = true
 		
-		if dir.dot(velocity) >= 0:
+		if dir.dot(velocity) > 0:
 			h_accel = GROUND_ACCEL
 		else:
 			h_accel = GROUND_DECEL

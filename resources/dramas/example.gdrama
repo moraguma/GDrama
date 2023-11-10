@@ -2,4 +2,18 @@
 Talky: OII OI OI IIIOIIII
 Talky: Eu odiei as suas flores! asdasdasdasdasd
 Talky: EU TÔ FALANDO COISA AINDA AINDA AINDA MAIORES!!! OLHA EU QUANTAS PALAVRINHAS LINDAS CABEM NESSA CAIXA DE TEXTO!! É DISSO QUE EU TÔ FALANDO BABEY!!!!!
-<end "default">
+<choice "Opção 1" Op1>
+<choice "Opção 2" Op2>
+<choice "Opção 3" Op3>
+
+<beat Op1>
+Talky: Você escolheu a Op1
+<end "1">
+
+<beat Op2>
+Talky: Você escolheu a Op2
+<end "2">
+
+<beat Op3>
+Talky: Você escolheu a Op3
+<end "3">
