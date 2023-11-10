@@ -1,5 +1,3 @@
-@icon("res://addons/gdrama/icons/DramaPlayer.png")
-@tool
 extends DramaAnimator
 class_name DramaPlayer
 
@@ -27,31 +25,7 @@ signal ended_drama(info: String)
 # --------------------------------------------------------------------------------------------------
 # VARIABLES
 # --------------------------------------------------------------------------------------------------
-## Path of the GDrama that should be loaded
-@export var gdrama_path: String:
-	set(value):
-		gdrama_path = value
-		update_configuration_warnings()
-
-
 @onready var drama_reader: DramaReader = DramaReader.new()
-
-
-# --------------------------------------------------------------------------------------------------
-# BUILT-INS
-# --------------------------------------------------------------------------------------------------
-func _get_configuration_warnings():
-	if gdrama_path == "":
-		return ["GDrama file not set"]
-	elif not FileAccess.file_exists(gdrama_path):
-		return ["Unable to locate GDrama at " + gdrama_path]
-	return []
-
-
-func _ready():
-	if gdrama_path != "":
-		load_gdrama(gdrama_path)
-	super._ready()
 
 
 # --------------------------------------------------------------------------------------------------
@@ -62,7 +36,7 @@ func load_gdrama(path: String):
 
 ## Connects the signals emitted by this node to the respective functions in the
 ## given DramaDisplay
-func connect_display(display: DramaDisplay):
+func connect_display(display):
 	skipped.connect(display._skipped)
 	direction_ended.connect(display._direction_ended)
 	set_raw_text.connect(display._set_raw_text)
@@ -74,7 +48,7 @@ func connect_display(display: DramaDisplay):
 
 
 ## Disconnects signal from given DramaDisplay
-func disconnect_display(display: DramaDisplay):
+func disconnect_display(display):
 	skipped.disconnect(display._skipped)
 	direction_ended.disconnect(display._direction_ended)
 	set_raw_text.disconnect(display._set_raw_text)

@@ -1,7 +1,6 @@
-@icon("res://addons/gdrama/icons/DramaDisplay.png")
-@tool
-extends Node
-class_name DramaDisplay
+@icon("res://addons/gdrama/icons/DramaDisplay3D.png")
+extends Node3D
+class_name DramaDisplay3D
 
 # --------------------------------------------------------------------------------------------------
 # INHERITABLES

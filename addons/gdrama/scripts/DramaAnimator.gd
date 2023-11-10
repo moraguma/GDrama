@@ -1,4 +1,3 @@
-@icon("res://addons/gdrama/icons/DramaAnimator.png")
 extends Node
 class_name DramaAnimator
 
