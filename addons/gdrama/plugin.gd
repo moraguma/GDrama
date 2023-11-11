@@ -19,12 +19,12 @@ const TYPE_BASES = [
 	"Node"
 ]
 const TYPE_SCRIPTS = [
-	preload("res://addons/gdrama/scripts/DramaDisplay2D.gd"),
-	preload("res://addons/gdrama/scripts/DramaDisplay3D.gd"),
-	preload("res://addons/gdrama/scripts/DramaDisplayControl.gd"),
-	preload("res://addons/gdrama/scripts/DramaInterface2D.gd"),
-	preload("res://addons/gdrama/scripts/DramaInterface3D.gd"),
-	preload("res://addons/gdrama/scripts/DramaInterface.gd")
+	preload("res://addons/gdrama/scripts/components/DramaDisplay2D.gd"),
+	preload("res://addons/gdrama/scripts/components/DramaDisplay3D.gd"),
+	preload("res://addons/gdrama/scripts/components/DramaDisplayControl.gd"),
+	preload("res://addons/gdrama/scripts/components/DramaInterface2D.gd"),
+	preload("res://addons/gdrama/scripts/components/DramaInterface3D.gd"),
+	preload("res://addons/gdrama/scripts/components/DramaInterface.gd")
 ]
 const TYPE_ICONS = [
 	preload("res://addons/gdrama/icons/DramaDisplay2D.png"),

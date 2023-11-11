@@ -1,20 +1,23 @@
 extends Resource
-
-
 class_name GDramaTranspiler
 
 
-const ESCAPABLES = ["<", ">", "\"", "\'", "$"]
 const CLOSERS = {"\"": "\"", "{": "}", "<": ">",  "(": ")"}
 const EMPTY = [" "]
 
 
-# ------------------------------------------------------------------------------
-# GDrama Parsing
-# ------------------------------------------------------------------------------
+var consts: Dictionary = {}
+var beats: Array = []
+var line: int = 0
+var column: int = 0
+
+var errors: Array = []
 
 
-# Given a GDrama code, returns its resulting JSON dictionary
+# ------------------------------------------------------------------------------
+# PARSING
+# ------------------------------------------------------------------------------
+## Given a GDrama code, returns its resulting JSON dictionary
 static func get_json(code: String) -> Dictionary:
 	var result = {"start": null, "beats": {}}
 	var consts = {}
@@ -114,6 +117,90 @@ static func get_json(code: String) -> Dictionary:
 	return result
 
 
+## Fills the beats array with all beats present in code
+func read_beats(code: String) -> void:
+	var pos = 0
+	while pos < len(code):
+		if is_character_in_pos(code, "<", pos):
+			var call = parse_call(code, pos, ["{"])
+			if call[0] == "beat":
+				check_beat()
+
+
+## Parses a call String of the form "func arg1 arg2..." into an array R of
+## strings such that R[0] = func and R[1:] = [arg1, arg2, ...]. The given 
+## joiners are the subcalls we should watch out for (unless they are escaped)
+func parse_call(s: String, pos: int, joiners: Array[String]) -> Array[String]:
+	var enter = PackedByteArray([0])
+	enter.encode_u8(0, 10)
+	
+	assert(s[pos] in CLOSERS, "Called parse_call outside call start")
+	var closer = CLOSERS[s[pos]]
+	
+	var escapables = joiners.duplicate()
+	for joiner in joiners:
+		assert(joiner in CLOSERS, "Joiner not in CLOSERS")
+		escapables.append(CLOSERS[joiner])
+	
+	pos += 1
+	var element_pos = pos
+	var result = []
+	
+	# While call isn't over
+	while not is_character_in_pos(s, ">", pos):
+		add_error(s[pos].to_utf8_buffer() == enter, "Command missing closer \">\"")
+		var added_element = false 
+		
+		# Has subcall started
+		var joiner = is_any_character_in_pos(s, joiners, pos)
+		if joiner != false:
+			if element_pos < pos: # Adds previous element if not whitespace
+				result.append(remove_escapes(s.substr(element_pos, pos - element_pos), escapables))
+				element_pos = pos
+			
+			pos = advance_until(s, pos, CLOSERS[joiner]) # Closes subcall
+			added_element = true
+			break
+		
+		# Finishes regular call if empty space
+		if not added_element and is_empty_space(s, pos):
+			added_element = true
+		
+		if added_element: # Adds element to result and advances pos
+			result.append(remove_escapes(s.substr(element_pos, pos - element_pos), escapables))
+			pos = advance_empty_spaces(s, pos)
+			element_pos = pos
+		else: # Element still being processed
+			pos += 1
+			column += 1
+	
+	return result
+
+
+## Removes escape characters from string as long as they are escaping a character
+## given in escapables
+func remove_escapes(s: String, escapables: Array[String]) -> String:
+	var pos = 0
+	while pos < len(s):
+		var escaping = false
+		if pos + 1 < len(s):
+			escaping = s[pos + 1] in escapables
+		if is_character_in_pos(s, "\\", pos) and escaping:
+			s = remove_from_string(s, pos)
+		else:
+			pos += 1
+	return s
+
+
+func add_error(condition: bool, error: String) -> void:
+	if condition:
+		errors.append({
+			"line_number": line,
+			"column_number": column,
+			"error": error
+		})
+
+
 static func check_and_advance_pos(call: Array, total_args: int, code: String, pos: int) -> int:
 	check_arg_count(call, total_args)
 	return advance_until(code, pos, ">") + 1
@@ -123,12 +210,6 @@ static func check_and_get_call(call: Array, current_beat: String) -> Dictionary:
 	check_beat_call(call, current_beat)
 	return {"type": "CALL", "call": "{" + call[0] + " " + " ".join(call.slice(1)) + "}"}
 
-
-# If the argument array passed contains a different number of arguments than
-# expected, pushes an error message
-static func check_arg_count(l: Array, total_args: int):
-	if len(l) - 1 != total_args:
-		push_error(str(total_args) + " arguments expected in " + l[0] + " function. " + str(len(l) - 1) + "provided") 
 
 
 ## If not currently in beat, pushes error
@@ -164,14 +245,55 @@ static func import_consts(path: String) -> Dictionary:
 	return consts
 
 
+# --------------------------------------------------------------------------------------------------
+# ERRORS
+# --------------------------------------------------------------------------------------------------
+# If the argument array passed contains a different number of arguments than
+# expected, pushes an error message
+func check_arg_count(l: Array, total_args: int):
+	add_error(len(l) - 1 != total_args, str(total_args) + " arguments expected in " + l[0] + " function. " + str(len(l) - 1) + "provided")
+
+
 # ------------------------------------------------------------------------------
-# String Utils
+# STRING UTILS
 # ------------------------------------------------------------------------------
+
+
+## Checks if a specific character is in a position, ignoring it in the case it 
+## is escaped
+static func is_character_in_pos(s: String, char: String, pos: int) -> bool:
+	var escape_escaped = false
+	if pos - 2 >= 0:
+		escape_escaped = s[pos - 2] == "\\"
+	return s[pos] == char and s[max(0, pos - 1)] != "\\" or escape_escaped
+
+
+## If one of the characters is in the specified position, returns that character.
+## Otherwise, returns false. Ignores escaped characters
+static func is_any_character_in_pos(s: String, chars: Array[String], pos: int):
+	var escape_escaped = false
+	if pos - 2 >= 0:
+		escape_escaped = s[pos - 2] == "\\"
+	
+	for char in chars:
+		if s[pos] == char and s[max(0, pos - 1)] != "\\" or escape_escaped:
+			return char
+	return false
 
 
 # Returns the string s with the character at the given position removed
 static func remove_from_string(s: String, pos: int) -> String:
 	return s.substr(0, pos) + s.substr(pos + 1)
+
+
+## Check if space is a space, carriage return or line feed
+static func is_empty_space(s: String, pos: int) -> bool:
+	var empty = [PackedByteArray([0]), PackedByteArray([0]), PackedByteArray([0])]
+	empty[0].encode_u8(0, 32) # Space
+	empty[1].encode_u8(0, 13) # Carriage return
+	empty[2].encode_u8(0, 10) # Line feed
+	
+	return s[pos].to_utf8_buffer() in empty
 
 
 # Advances empty spaces in s starting from pos until pos is at a non-empty
@@ -197,7 +319,7 @@ static func advance_until(s: String, pos: int, x: String) -> int:
 	if pos >= len(s):
 		return pos
 	
-	while s[pos] != x:
+	while not is_character_in_pos(s, x, pos):
 		pos += 1
 		if pos >= len(s):
 			break
@@ -217,57 +339,6 @@ static func advance_until_enter(s: String, pos: int) -> int:
 		if pos >= len(s):
 			break
 	return pos
-
-
-# Parses a call String of the form "func arg1 arg2..." into an array R of
-# strings such that R[0] = func and R[1:] = [arg1, arg2, ...]
-static func parse_call(call_string: String, pos: int) -> Array[String]:
-	var new_call = String(call_string)
-	
-	if new_call[pos] in CLOSERS:
-		var enveloper = new_call[pos]
-		var subenveloper
-		var result: Array[String]
-		result = []
-		
-		pos += 1
-		var size = 0
-		
-		while new_call[pos + size] != CLOSERS[enveloper]:
-			if new_call[pos + size] == "\\":
-				new_call = remove_from_string(new_call, pos + size)
-				size += 1
-			elif subenveloper != null:
-				if new_call[pos + size] == CLOSERS[subenveloper]:
-					if subenveloper != "{":
-						result.append(new_call.substr(pos, size))
-					else: 
-						result.append(new_call.substr(pos, size + 1))
-					pos = advance_empty_spaces(new_call, pos + size + 1)
-					size = 0
-					subenveloper = null
-				else:
-					size += 1
-			elif new_call[pos + size] in CLOSERS and size == 0:
-				subenveloper = new_call[pos + size]
-				if subenveloper != "{":
-					pos += 1
-			elif new_call[pos + size] == " ":
-				result.append(new_call.substr(pos, size))
-				pos = advance_empty_spaces(new_call, pos + size + 1)
-				size = 0
-			else:
-				size += 1
-		
-		if size != 0:
-			result.append(new_call.substr(pos, size))
-			size = 0
-		
-		return result
-	else:
-		push_error("Invalid call \"" + new_call + "\" at position " + str(pos))
-	
-	return []
 
 
 # Given a string, returns it with any empty spaces in the borders removed
