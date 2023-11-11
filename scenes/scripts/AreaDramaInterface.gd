@@ -19,4 +19,3 @@ func hide_trigger():
 
 func play_drama():
 	await super.play_drama()
-	display_trigger()

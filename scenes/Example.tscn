@@ -273,6 +273,11 @@ layer_1/tile_data = PackedInt32Array()
 [node name="Player" parent="." instance=ExtResource("2_k8vpn")]
 position = Vector2(216, 792)
 
+[node name="Camera2D" type="Camera2D" parent="Player"]
+offset = Vector2(0, -300)
+limit_left = 0
+position_smoothing_enabled = true
+
 [node name="Talky" parent="." instance=ExtResource("5_ondmo")]
 position = Vector2(1656, 792)
 texture_path = "res://resources/sprites/Talky.png"
@@ -282,9 +287,13 @@ actor_name = "Talky"
 flip_h = true
 
 [node name="AreaDramaInterface" parent="." node_paths=PackedStringArray("intro_drama_display", "drama_displays") instance=ExtResource("5_0m6jn")]
-position = Vector2(1440, 864)
+position = Vector2(1656, 864)
 intro_drama_display = NodePath("../Talky/BubbleDramaDisplay")
 drama_displays = [NodePath("../Talky/BubbleDramaDisplay")]
 gdrama_path = "res://resources/dramas/example.gdrama"
 
+[node name="StandingPos" parent="AreaDramaInterface" index="1"]
+position = Vector2(-360, -72)
+
 [editable path="Talky"]
+[editable path="AreaDramaInterface"]

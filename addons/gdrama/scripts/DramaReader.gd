@@ -6,6 +6,7 @@ var drama: Dictionary
 var beat: String
 var pointer: String
 var to_call: Object
+var local_flags: Dictionary = {}
 
 
 func _init(to_call: Object = self):

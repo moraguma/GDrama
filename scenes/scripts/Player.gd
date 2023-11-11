@@ -31,9 +31,13 @@ func _input_process():
 		await move_h(drama_interface.standing_pos[0] - position[0])
 		queue_flip_h = drama_interface.look_left
 		
+		var drama_interface_ref = drama_interface
 		drama_interface.drama_player.connect_display(drama_display)
 		await drama_interface.play_drama()
-		drama_interface.drama_player.disconnect_display(drama_display)
+		drama_interface_ref.drama_player.disconnect_display(drama_display)
+		
+		if drama_interface != null:
+			drama_interface.display_trigger()
 		
 		return_control()
 
@@ -55,5 +59,6 @@ func enter_cutscene_area(area):
 
 func exit_cutscene_area(area):
 	if drama_interface != null:
-		drama_interface.hide_trigger()
+		if controllable:
+			drama_interface.hide_trigger()
 		drama_interface = null

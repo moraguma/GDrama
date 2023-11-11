@@ -158,7 +158,7 @@ func display_choice():
 
 func display(t: String, actor_name: String = "", start_invisible: bool = true):
 	text.text = "[center]" + t
-	var height_dif = Vector2(0, text.theme.get_default_font().get_multiline_string_size(erase_bbcode(t), HORIZONTAL_ALIGNMENT_CENTER, text.size[0], text.theme.get_default_font_size())[1] - text.custom_minimum_size[1])
+	var height_dif = Vector2(0, text.theme.get_default_font().get_multiline_string_size(erase_bbcode(t), HORIZONTAL_ALIGNMENT_CENTER, text.size[0], text.theme.get_default_font_size(), -1, 11)[1] - text.custom_minimum_size[1])
 	
 	position = base_pos - height_dif
 	next.position = next_base_pos + height_dif
