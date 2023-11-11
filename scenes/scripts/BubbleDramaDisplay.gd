@@ -221,3 +221,8 @@ func scamper(actor: String):
 func stop_scamper(actor: String):
 	if actor_name == actor:
 		char.stop_scamper()
+
+
+func jump(actor: String):
+	if actor_name == actor:
+		char.jump()
