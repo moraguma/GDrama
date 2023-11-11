@@ -1,28 +1,44 @@
 <beat Start>
-<branch HasTalked talked>
-<flag talked>
-Talky: OII OI OI IIIOIIII
-Talky: Eu odiei as suas flores! asdasdasdasdasd
-Talky: EU TÔ FALANDO COISA AINDA AINDA AINDA MAIORES!!! OLHA EU QUANTAS PALAVRINHAS LINDAS CABEM NESSA CAIXA DE TEXTO!! É DISSO QUE EU TÔ FALANDO BABEY!!!!!
-<choice "Opção 1" Op1>
-<choice "Opção 2" Op2>
-<choice "Opção 3" Op3>
+    <branch HasTalked talked>
+    <flag talked>
+    Talky: Hey! Welcome to the GDrama demo!
+    Talky: As you can see... (wait 0.5)(jump Talky)my name is Talky! (wait 0.5)I'm here to give you a little introduction to GDrama
+    Talky: But first, (wait 0.2)I wanna ask you a question
+    Talky: What is it that brought you here?
+    <choice "I wanna make dialogue systems for my own games!" GameDev>
+    <choice "I found this randomly and wanted to check it out" Random>
+    <choice "Actually, I'm here to talk to you specifically" TalkyFan>
 
-<beat Op1>
-Talky: Você escolheu a Op1
-Talky: (scamper Talky)Adoooooro... eu adooooooooooooooooooooooooooooooooro correr por aí eu acho uma maravilha
-Talky: Tão bom.... tão bom correr.....
-Talky: Ok... (wait 1.0)(stop_scamper Talky)Ok, parei
-<end "1">
+<beat GameDev>
+    Talky: (scamper Talky)Ah, that's so fun! (wait 0.5)I love games with cool dialogue systems!
+    Talky: (stop_scamper Talky)I hope GDrama has what you're looking for!
+    <jump NormalEnd>
 
-<beat Op2>
-Talky: Você escolheu a Op2
-<end "2">
+<beat Random>
+    Talky: (jump Talky)Ha! That's interesting
+    Talky: Then I hope you have fun exploring!
+    Talky: Speaking of which...
+    <jump NormalEnd>
 
-<beat Op3>
-Talky: Você escolheu a Op3
-<end "3">
+<beat TalkyFan>
+    <flag fan>
+    Talky: (jump Talky)Oh! (wait 0.5)Ha ha... (wait 0.5)Now you got me flustered...
+    Talky: Um... (wait 0.5)Anyway...
+    <jump NormalEnd>
+
+<beat NormalEnd>
+    Talky: You can take a walk around this area to talk to some other people!
+    Talky: I Hope you enjoy GDrama!
+    <end>
 
 <beat HasTalked>
-Talky: Hey, we've talked before!
-Talky: Sorry, I'm not saying anything else. No sir
+    Talky: (jump Talky)Back for more Talky, eh?
+    Talky: I'll be here for a while, feel free to take a walk around!
+    <branch HasTalkedFan fan>
+    <end>
+
+<beat HasTalkedFan>
+    Talky: \(Unless... (wait 0.5)maybe they missed me?)
+    Talky: \(Ha ha... (wait 0.5)stop being silly...)
+    <unflag fan>
+    <end>

@@ -22,6 +22,13 @@ signal spoke(letter: String)
 ## handled by this node
 signal drama_call(method_name: String, args: Array)
 
+
+# --------------------------------------------------------------------------------------------------
+# CONSTANTS
+# --------------------------------------------------------------------------------------------------
+const ESCAPABLES = ["(", ")"]
+
+
 # --------------------------------------------------------------------------------------------------
 # VARIABLES
 # --------------------------------------------------------------------------------------------------
@@ -49,7 +56,10 @@ func animate(s: String):
 	var pos = 0
 	
 	while pos < len(raw_text):
-		if raw_text[pos] == "(" and raw_text[max(pos - 1, 0)] != "\\":
+		if raw_text[pos] == "\\" and raw_text[min(pos + 1, len(raw_text))] in ESCAPABLES:
+			raw_text = GDramaTranspiler.remove_from_string(raw_text, pos)
+			pos += 1
+		elif raw_text[pos] == "(" and raw_text[max(pos - 1, 0)] != "\\":
 			var call = GDramaTranspiler.parse_call(raw_text, pos)
 			steps.append({"type": "CALL", "call": call})
 			
