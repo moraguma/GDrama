@@ -1,24 +1,234 @@
 extends Resource
-class_name GDramaTranspiler
+class_name GDramaCompiler
 
 
-const CLOSERS = {"\"": "\"", "{": "}", "<": ">",  "(": ")"}
-const EMPTY = [" "]
-
+const CALL_ESCAPABLES: Array[String] = ["\"", "\'", "<", ">"]
+const STRING_ESCAPABLES: Array[String]= ["\"", "\'"]
+const CALL_CLOSERS = {"<": ">"}
+const STRING_CLOSERS = {"\"": "\"", "\'": "\'"}
+var SPACE = PackedByteArray([0])
+var TAB = PackedByteArray([0])
+var ENTER = PackedByteArray([0])
 
 var consts: Dictionary = {}
 var beats: Array = []
 var line: int = 0
 var column: int = 0
+var pos: int = 0
+var code: String
 
 var errors: Array = []
+var result: GDramaResource = GDramaResource.new()
+
+
+func _init():
+	SPACE.encode_u8(0, 32) # Space
+	TAB.encode_u8(0, 13) # Carriage return
+	ENTER.encode_u8(0, 10) # Line feed
 
 
 # ------------------------------------------------------------------------------
 # PARSING
 # ------------------------------------------------------------------------------
+
+
+func compile(path: String):
+	code = FileAccess.open(path, FileAccess.READ).get_as_text()
+	read_beats()
+	pass
+
+
+## Fills the beats array with all beats present in code
+func read_beats() -> void:
+	go_to_start()
+	while pos < len(code):
+		if is_character_in_pos("<"):
+			var call = parse_call()
+			if call[0] == "beat":
+				check_arg_count(call, 1)
+				beats.append(call[1])
+		advance_until("<")
+
+
+## Parses a string starting in pos. Returns the full string
+func parse_string() -> String:
+	assert(is_any_character_in_pos(STRING_CLOSERS.keys()), "Called parse_string outside string start")
+	var closer = STRING_CLOSERS[code[pos]]
+	
+	advance_pos()
+	var start_pos = pos
+	
+	while not is_character_in_pos(closer):
+		add_error(code[pos].to_utf8_buffer() == ENTER, "Unterminated string")
+		advance_pos()
+	
+	var result = remove_escapes(code.substr(start_pos, pos - start_pos), ["\"", "\'"])
+	advance_pos()
+	return result
+
+
+## Parses a call String of the form "func arg1 arg2..." into an array R of
+## strings such that R[0] = func and R[1:] = [arg1, arg2, ...]. Note that an
+## arg can also be a call enveloped by {}; in that case, that args will also 
+## be a string
+func parse_call(subcalled: bool = false) -> Array:
+	assert(code[pos] in CALL_CLOSERS, "Called parse_call outside call start")
+	var closer = CALL_CLOSERS[code[pos]]
+	
+	advance_pos()
+	var element_pos = pos
+	var result = []
+	var append_and_advance = func(to_append): # Adds to result
+		result.append(to_append)
+		advance_empty_spaces()
+		return pos
+	
+	# While call isn't over
+	while not is_character_in_pos(closer):
+		var old_element_pos = element_pos
+		add_error(code[pos].to_utf8_buffer() == ENTER, "Command missing closer \"" + closer + "\"")
+		
+		# Check for subcall
+		if is_character_in_pos("<"):
+			if element_pos < pos:
+				element_pos = append_and_advance.call(remove_escapes(code.substr(element_pos, pos - element_pos), CALL_ESCAPABLES))
+			
+			if subcalled:
+				add_error(true, "Subcall found within a subcall")
+				return result
+			else:
+				element_pos = append_and_advance.call(parse_call(true))
+		
+		# Check for string
+		if is_any_character_in_pos(STRING_CLOSERS.keys()):
+			if element_pos < pos:
+				element_pos = append_and_advance.call(remove_escapes(code.substr(element_pos, pos - element_pos), STRING_ESCAPABLES))
+			element_pos = append_and_advance.call(parse_string())
+		
+		# Check for end of arg
+		if is_empty_space():
+			element_pos = append_and_advance.call(remove_escapes(code.substr(element_pos, pos - element_pos), CALL_ESCAPABLES))
+		
+		# Advance if nothing happened
+		if element_pos == old_element_pos:
+			advance_pos()
+	
+	if element_pos < pos:
+		element_pos = append_and_advance.call(remove_escapes(code.substr(element_pos, pos - element_pos), CALL_ESCAPABLES))
+	
+	advance_pos()
+	return result
+
+
+## Sets pos, column and pos to start of file
+func go_to_start():
+	line = 0
+	column = 0
+	pos = 0
+
+
+func is_empty_space() -> bool:
+	return code[pos].to_utf8_buffer() in [SPACE, TAB, ENTER]
+
+
+## Advances empty spaces in s starting from pos until pos is at a non-empty
+## character
+func advance_empty_spaces() -> void:
+	if pos >= len(code):
+		return
+	
+	while is_empty_space():
+		advance_pos()
+		if pos >= len(code):
+			break
+
+
+## Advances pos, column and line
+func advance_pos() -> void:
+	pos += 1
+	column += 1
+	if code[pos - 1].to_utf8_buffer() == ENTER:
+		line += 1
+		column = 0
+
+
+## Advances spaces until pos is at x
+func advance_until(x: String) -> void:
+	if pos >= len(code):
+		return
+	
+	while not is_character_in_pos(x):
+		advance_pos()
+		if pos >= len(code):
+			break
+
+
+func add_error(condition: bool, error: String) -> void:
+	if condition:
+		errors.append({
+			"line_number": line,
+			"column_number": column,
+			"error": error
+		})
+
+
+## Checks if a specific character is in a position, ignoring it in the case it 
+## is escaped
+func is_character_in_pos(char: String) -> bool:
+	var escape_escaped = false
+	if pos - 2 >= 0:
+		escape_escaped = code[pos - 2] == "\\"
+	return code[pos] == char and code[max(0, pos - 1)] != "\\" or escape_escaped
+
+
+## If one of the characters is in the specified position, returns that character.
+## Otherwise, returns false. Ignores escaped characters
+func is_any_character_in_pos(chars: Array):
+	var escape_escaped = false
+	if pos - 2 >= 0:
+		escape_escaped = code[pos - 2] == "\\"
+	
+	for char in chars:
+		if code[pos] == char and code[max(0, pos - 1)] != "\\" or escape_escaped:
+			return char
+	return false
+
+
+# If the argument array passed contains a different number of arguments than
+# expected, pushes an error message
+func check_arg_count(l: Array, total_args: int):
+	add_error(len(l) - 1 != total_args, str(total_args) + " arguments expected in " + l[0] + " function. " + str(len(l) - 1) + "provided")
+
+
+## Removes escape characters from string as long as they are escaping a character
+## given in escapables
+static func remove_escapes(s: String, escapables: Array[String]) -> String:
+	var pos = 0
+	while pos < len(s):
+		var escaping = false
+		if pos + 1 < len(s):
+			escaping = s[pos + 1] in escapables
+		
+		var escape_escaped = false
+		if pos - 2 >= 0:
+			escape_escaped = s[pos - 2] == "\\"
+		var in_pos = s[pos] == "\\" and s[max(0, pos - 1)] != "\\" or escape_escaped
+		
+		if in_pos and escaping:
+			s = remove_from_string(s, pos)
+		else:
+			pos += 1
+	return s
+
+
+# Returns the string s with the character at the given position removed
+static func remove_from_string(s: String, pos: int) -> String:
+	return s.substr(0, pos) + s.substr(pos + 1)
+
+
 ## Given a GDrama code, returns its resulting JSON dictionary
-static func get_json(code: String) -> Dictionary:
+"""
+func get_json(code: String) -> Dictionary:
 	var result = {"start": null, "beats": {}}
 	var consts = {}
 	
@@ -117,90 +327,6 @@ static func get_json(code: String) -> Dictionary:
 	return result
 
 
-## Fills the beats array with all beats present in code
-func read_beats(code: String) -> void:
-	var pos = 0
-	while pos < len(code):
-		if is_character_in_pos(code, "<", pos):
-			var call = parse_call(code, pos, ["{"])
-			if call[0] == "beat":
-				check_beat()
-
-
-## Parses a call String of the form "func arg1 arg2..." into an array R of
-## strings such that R[0] = func and R[1:] = [arg1, arg2, ...]. The given 
-## joiners are the subcalls we should watch out for (unless they are escaped)
-func parse_call(s: String, pos: int, joiners: Array[String]) -> Array[String]:
-	var enter = PackedByteArray([0])
-	enter.encode_u8(0, 10)
-	
-	assert(s[pos] in CLOSERS, "Called parse_call outside call start")
-	var closer = CLOSERS[s[pos]]
-	
-	var escapables = joiners.duplicate()
-	for joiner in joiners:
-		assert(joiner in CLOSERS, "Joiner not in CLOSERS")
-		escapables.append(CLOSERS[joiner])
-	
-	pos += 1
-	var element_pos = pos
-	var result = []
-	
-	# While call isn't over
-	while not is_character_in_pos(s, ">", pos):
-		add_error(s[pos].to_utf8_buffer() == enter, "Command missing closer \">\"")
-		var added_element = false 
-		
-		# Has subcall started
-		var joiner = is_any_character_in_pos(s, joiners, pos)
-		if joiner != false:
-			if element_pos < pos: # Adds previous element if not whitespace
-				result.append(remove_escapes(s.substr(element_pos, pos - element_pos), escapables))
-				element_pos = pos
-			
-			pos = advance_until(s, pos, CLOSERS[joiner]) # Closes subcall
-			added_element = true
-			break
-		
-		# Finishes regular call if empty space
-		if not added_element and is_empty_space(s, pos):
-			added_element = true
-		
-		if added_element: # Adds element to result and advances pos
-			result.append(remove_escapes(s.substr(element_pos, pos - element_pos), escapables))
-			pos = advance_empty_spaces(s, pos)
-			element_pos = pos
-		else: # Element still being processed
-			pos += 1
-			column += 1
-	
-	return result
-
-
-## Removes escape characters from string as long as they are escaping a character
-## given in escapables
-func remove_escapes(s: String, escapables: Array[String]) -> String:
-	var pos = 0
-	while pos < len(s):
-		var escaping = false
-		if pos + 1 < len(s):
-			escaping = s[pos + 1] in escapables
-		if is_character_in_pos(s, "\\", pos) and escaping:
-			s = remove_from_string(s, pos)
-		else:
-			pos += 1
-	return s
-
-
-func add_error(condition: bool, error: String) -> void:
-	if condition:
-		errors.append({
-			"line_number": line,
-			"column_number": column,
-			"error": error
-		})
-
-
 static func check_and_advance_pos(call: Array, total_args: int, code: String, pos: int) -> int:
 	check_arg_count(call, total_args)
 	return advance_until(code, pos, ">") + 1
@@ -248,82 +374,11 @@ static func import_consts(path: String) -> Dictionary:
 # --------------------------------------------------------------------------------------------------
 # ERRORS
 # --------------------------------------------------------------------------------------------------
-# If the argument array passed contains a different number of arguments than
-# expected, pushes an error message
-func check_arg_count(l: Array, total_args: int):
-	add_error(len(l) - 1 != total_args, str(total_args) + " arguments expected in " + l[0] + " function. " + str(len(l) - 1) + "provided")
 
 
 # ------------------------------------------------------------------------------
 # STRING UTILS
 # ------------------------------------------------------------------------------
-
-
-## Checks if a specific character is in a position, ignoring it in the case it 
-## is escaped
-static func is_character_in_pos(s: String, char: String, pos: int) -> bool:
-	var escape_escaped = false
-	if pos - 2 >= 0:
-		escape_escaped = s[pos - 2] == "\\"
-	return s[pos] == char and s[max(0, pos - 1)] != "\\" or escape_escaped
-
-
-## If one of the characters is in the specified position, returns that character.
-## Otherwise, returns false. Ignores escaped characters
-static func is_any_character_in_pos(s: String, chars: Array[String], pos: int):
-	var escape_escaped = false
-	if pos - 2 >= 0:
-		escape_escaped = s[pos - 2] == "\\"
-	
-	for char in chars:
-		if s[pos] == char and s[max(0, pos - 1)] != "\\" or escape_escaped:
-			return char
-	return false
-
-
-# Returns the string s with the character at the given position removed
-static func remove_from_string(s: String, pos: int) -> String:
-	return s.substr(0, pos) + s.substr(pos + 1)
-
-
-## Check if space is a space, carriage return or line feed
-static func is_empty_space(s: String, pos: int) -> bool:
-	var empty = [PackedByteArray([0]), PackedByteArray([0]), PackedByteArray([0])]
-	empty[0].encode_u8(0, 32) # Space
-	empty[1].encode_u8(0, 13) # Carriage return
-	empty[2].encode_u8(0, 10) # Line feed
-	
-	return s[pos].to_utf8_buffer() in empty
-
-
-# Advances empty spaces in s starting from pos until pos is at a non-empty
-# character
-static func advance_empty_spaces(s: String, pos: int) -> int:
-	if pos >= len(s):
-		return pos
-	
-	var empty = [PackedByteArray([0]), PackedByteArray([0]), PackedByteArray([0])]
-	empty[0].encode_u8(0, 32) # Space
-	empty[1].encode_u8(0, 13) # Carriage return
-	empty[2].encode_u8(0, 10) # Line feed
-	
-	while s[pos].to_utf8_buffer() in empty:
-		pos += 1
-		if pos >= len(s):
-			break
-	return pos
-
-
-# Advances spaces in s starting from pos until pos is at x
-static func advance_until(s: String, pos: int, x: String) -> int:
-	if pos >= len(s):
-		return pos
-	
-	while not is_character_in_pos(s, x, pos):
-		pos += 1
-		if pos >= len(s):
-			break
-	return pos
 
 
 # Advances spaces in s starting from pos until pos is at \n
@@ -390,3 +445,4 @@ static func replace_consts(s: String, consts: Dictionary) -> String:
 				s = remove_from_string(s, pos)
 			pos += 1
 	return s
+"""
