@@ -1,4 +1,6 @@
 <beat Start>
+<branch HasTalked talked>
+<flag talked>
 Talky: OII OI OI IIIOIIII
 Talky: Eu odiei as suas flores! asdasdasdasdasd
 Talky: EU TÔ FALANDO COISA AINDA AINDA AINDA MAIORES!!! OLHA EU QUANTAS PALAVRINHAS LINDAS CABEM NESSA CAIXA DE TEXTO!! É DISSO QUE EU TÔ FALANDO BABEY!!!!!
@@ -20,3 +22,7 @@ Talky: Você escolheu a Op2
 <beat Op3>
 Talky: Você escolheu a Op3
 <end "3">
+
+<beat HasTalked>
+Talky: Hey, we've talked before!
+Talky: Sorry, I'm not saying anything else. No sir

@@ -6,7 +6,7 @@ var drama: Dictionary
 var beat: String
 var pointer: String
 var to_call: Object
-var local_flags: Dictionary = {}
+var flags: Dictionary = {}
 
 
 func _init(to_call: Object = self):
@@ -133,15 +133,33 @@ func replace_commands_in_fields(d: Dictionary, fields: Array[String]) -> Diction
 # ------------------------------------------------------------------------------
 # GDrama Commands
 # ------------------------------------------------------------------------------
-
-
-# Jumps beat and pointer to the start of the specified beat
+## Jumps beat and pointer to the start of the specified beat
 func jump(target_beat: String) -> void:
 	beat = target_beat
 	pointer = "0"
 
 
-# Returns true
+## Jumps to target beat if flag is true
+func branch(target_beat: String, flag: String) -> void:
+	pointer = str(int(pointer) + 1)
+	if flag in flags:
+		if flags[flag]:
+			jump(target_beat)
+
+
+## Turns on a local flag
+func flag(name: String) -> void:
+	flags[name] = true
+	pointer = str(int(pointer) + 1)
+
+
+## Turns off a local flag
+func unflag(name: String) -> void:
+	flags[name] = false
+	pointer = str(int(pointer) + 1)
+
+
+## Returns true
 func get_true() -> bool:
 	return true
 

@@ -55,6 +55,27 @@ static func get_json(code: String) -> Dictionary:
 					current_step += 1
 					
 					pos = advance_until(code, pos, ">") + 1
+				"flag":
+					check_arg_count(call, 1)
+					check_beat(" ".join(call), current_beat)
+					
+					result["beats"][current_beat]["steps"][str(current_step)] = {"type": "CALL", "call": "{flag " + call[1] + "}"}
+					current_step += 1
+					pos = advance_until(code, pos, ">") + 1
+				"unflag":
+					check_arg_count(call, 1)
+					check_beat(" ".join(call), current_beat)
+					
+					result["beats"][current_beat]["steps"][str(current_step)] = {"type": "CALL", "call": "{unflag " + call[1] + "}"}
+					current_step += 1
+					pos = advance_until(code, pos, ">") + 1
+				"branch":
+					check_arg_count(call, 2)
+					check_beat(" ".join(call), current_beat)
+					
+					result["beats"][current_beat]["steps"][str(current_step)] = {"type": "CALL", "call": "{branch " + call[1] + " " + call[2] + "}"}
+					current_step += 1
+					pos = advance_until(code, pos, ">") + 1
 				"choice":
 					check_beat(" ".join(call), current_beat)
 					
