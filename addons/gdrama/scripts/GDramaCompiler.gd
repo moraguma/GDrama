@@ -16,7 +16,9 @@ var line: int = 0
 var column: int = 0
 var pos: int = 0
 var code: String
+var current_file: String
 
+var imported: Array[String] = []
 var errors: Array = []
 var result: GDramaResource = GDramaResource.new()
 
@@ -30,9 +32,10 @@ func _init():
 # ------------------------------------------------------------------------------
 # PARSING
 # ------------------------------------------------------------------------------
-
-
 func compile(path: String):
+	assert(FileAccess.file_exists(path), "Attempted to compile inexistent file")
+	
+	current_file = path
 	code = FileAccess.open(path, FileAccess.READ).get_as_text()
 	read_beats()
 	pass
@@ -50,6 +53,66 @@ func read_beats() -> void:
 		advance_until("<")
 
 
+## Replaces consts in current file
+func replace_consts() -> void:
+	go_to_start()
+	while pos < len(code):
+		process_const_line()
+		if is_character_in_pos("$"):
+			var start = pos
+			var name
+			advance_pos()
+			
+			# Get constant name
+			if is_any_character_in_pos(STRING_CLOSERS.keys()): # Is string
+				name = parse_string()
+			else:
+				var name_start = pos
+				while not is_empty_space():
+					advance_pos()
+				
+				if pos == name_start:
+					add_error("Found empty constant")
+				else:
+					name = code.substr(name_start, pos - name_start)
+			
+
+
+## Imports consts from given GDrama file
+func import_consts(path: String) -> void:
+	if not FileAccess.file_exists(path):
+		add_error("Import file doesn't exist")
+		return
+	
+	imported.append(path)
+	current_file = path
+	code = FileAccess.open(path, FileAccess.READ).get_as_text()
+	go_to_start()
+	while pos < len(code):
+		process_const_line()
+		advance_until("<")
+
+
+func process_const_line():
+	if is_character_in_pos("<"):
+			var call = parse_call()
+			match call[0]:
+				"import":
+					check_arg_count(call, 1)
+					if call[1] in imported:
+						add_error("Attempted cyclical import")
+					else:
+						var old_values = get_parsing_values()
+						import_consts(call[1])
+						set_parsing_values(old_values)
+				"const":
+					check_arg_count(call, 2)
+					if call[1] in consts:
+						add_error("Constant " + call[1] + " already defined")
+					else:
+						consts[call[1]] = call[2]
+
+
 ## Parses a string starting in pos. Returns the full string
 func parse_string() -> String:
 	assert(is_any_character_in_pos(STRING_CLOSERS.keys()), "Called parse_string outside string start")
@@ -59,7 +122,9 @@ func parse_string() -> String:
 	var start_pos = pos
 	
 	while not is_character_in_pos(closer):
-		add_error(code[pos].to_utf8_buffer() == ENTER, "Unterminated string")
+		if code[pos].to_utf8_buffer() == ENTER:
+			add_error("Unterminated string")
+			return ""
 		advance_pos()
 	
 	var result = remove_escapes(code.substr(start_pos, pos - start_pos), ["\"", "\'"])
@@ -86,7 +151,9 @@ func parse_call(subcalled: bool = false) -> Array:
 	# While call isn't over
 	while not is_character_in_pos(closer):
 		var old_element_pos = element_pos
-		add_error(code[pos].to_utf8_buffer() == ENTER, "Command missing closer \"" + closer + "\"")
+		if code[pos].to_utf8_buffer() == ENTER:
+			add_error("Command missing closer \"" + closer + "\"")
+			return result
 		
 		# Check for subcall
 		if is_character_in_pos("<"):
@@ -94,7 +161,7 @@ func parse_call(subcalled: bool = false) -> Array:
 				element_pos = append_and_advance.call(remove_escapes(code.substr(element_pos, pos - element_pos), CALL_ESCAPABLES))
 			
 			if subcalled:
-				add_error(true, "Subcall found within a subcall")
+				add_error("Subcall found within a subcall")
 				return result
 			else:
 				element_pos = append_and_advance.call(parse_call(true))
@@ -125,6 +192,18 @@ func go_to_start():
 	line = 0
 	column = 0
 	pos = 0
+
+
+func get_parsing_values():
+	return [code, pos, line, column, current_file]
+
+
+func set_parsing_values(values: Array):
+	self.code = values[0]
+	self.pos = values[1]
+	self.line = values[2]
+	self.column = values[3]
+	self.current_file = values[4]
 
 
 func is_empty_space() -> bool:
@@ -163,13 +242,12 @@ func advance_until(x: String) -> void:
 			break
 
 
-func add_error(condition: bool, error: String) -> void:
-	if condition:
-		errors.append({
-			"line_number": line,
-			"column_number": column,
-			"error": error
-		})
+func add_error(error: String) -> void:
+	errors.append({
+		"line_number": line,
+		"column_number": column,
+		"error": error
+	})
 
 
 ## Checks if a specific character is in a position, ignoring it in the case it 
@@ -197,7 +275,8 @@ func is_any_character_in_pos(chars: Array):
 # If the argument array passed contains a different number of arguments than
 # expected, pushes an error message
 func check_arg_count(l: Array, total_args: int):
-	add_error(len(l) - 1 != total_args, str(total_args) + " arguments expected in " + l[0] + " function. " + str(len(l) - 1) + "provided")
+	if len(l) - 1 != total_args:
+		add_error(str(total_args) + " arguments expected in " + l[0] + " function. " + str(len(l) - 1) + "provided")
 
 
 ## Removes escape characters from string as long as they are escaping a character
