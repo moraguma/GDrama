@@ -1,11 +1,9 @@
 @tool
 extends EditorImportPlugin
+class_name GDramaImportPlugin
 
 
 signal compiled_resource(resource: Resource)
-
-
-const GDRAMA_RESOURCE = preload("res://addons/gdrama/scripts/GDramaResource.gd")
 
 
 var editor_plugin
@@ -65,42 +63,19 @@ func _get_option_visibility(path: String, option_name: StringName, options: Dict
 func _import(source_file: String, save_path: String, options: Dictionary, platform_variants: Array[String], gen_files: Array[String]) -> Error:
 	# Get the raw file contents
 	if not FileAccess.file_exists(source_file): return ERR_FILE_NOT_FOUND
-
-	var file: FileAccess = FileAccess.open(source_file, FileAccess.READ)
-	var raw_text: String = file.get_as_text()
-
+	
 	# Parse the text
-	var parser: DialogueManagerParser = DialogueManagerParser.new()
-	var err: Error = parser.parse(raw_text, source_file)
-	var data: DialogueManagerParseResult = parser.get_data()
-	var errors: Array[Dictionary] = parser.get_errors()
-	parser.free()
+	var compiler: GDramaCompiler = GDramaCompiler.new()
+	compiler.compile(source_file)
+	var result: GDramaResource = compiler.get_result()
+	var errors: Array[Dictionary] = compiler.get_errors()
+	compiler.free()
 
-	if err != OK:
-		printerr("%d errors found in %s" % [errors.size(), source_file])
-		editor_plugin.add_errors_to_cache(source_file, errors)
-		return err
-
-	# Get the current addon version
-	var config: ConfigFile = ConfigFile.new()
-	config.load("res://addons/dialogue_manager/plugin.cfg")
-	var version: String = config.get_value("plugin", "version")
-
-	# Save the results to a resource
-	var resource: DialogueResource = DialogueResource.new()
-	resource.set_meta("dialogue_manager_version", version)
-
-	resource.using_states = data.using_states
-	resource.titles = data.titles
-	resource.first_title = data.first_title
-	resource.character_names = data.character_names
-	resource.lines = data.lines
-
-	# Clear errors and possibly trigger any cascade recompiles
-	editor_plugin.add_file_to_cache(source_file, data)
-
-	err = ResourceSaver.save(resource, "%s.%s" % [save_path, _get_save_extension()])
-
-	compiled_resource.emit(resource)
-
+	if len(errors) > 0:
+		printerr("%d errors found in %s" % [len(errors), source_file])
+		# TODO - Display errors
+		return FAILED
+	
+	var err = ResourceSaver.save(result, "%s.%s" % [save_path, _get_save_extension()])
+	compiled_resource.emit(result)
 	return err

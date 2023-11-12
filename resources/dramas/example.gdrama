@@ -1,7 +1,9 @@
+<const T Talky:>
+
 <beat Start>
     <branch HasTalked talked>
     <flag talked>
-    Talky: Hey! Welcome to the GDrama demo!
+    $T Hey! Welcome to the GDrama demo!
     Talky: As you can see... <wait 0.5><hop Talky>my name is Talky! <wait 0.5>I'm here to give you a little introduction to GDrama
     Talky: But first, <wait 0.2>I wanna ask you a question
     Talky: What is it that brought you here?

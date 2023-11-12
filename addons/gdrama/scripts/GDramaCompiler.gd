@@ -2,8 +2,9 @@ extends Resource
 class_name GDramaCompiler
 
 
-const CALL_ESCAPABLES: Array[String] = ["\"", "\'", "<", ">"]
-const STRING_ESCAPABLES: Array[String]= ["\"", "\'"]
+const DIRECTION_ESCAPABLES: Array[String] = ["$", ":", "<", ">"]
+const CALL_ESCAPABLES: Array[String] = ["\"", "\'", "<", ">", "$"]
+const STRING_ESCAPABLES: Array[String]= ["\"", "\'", "$"]
 const CALL_CLOSERS = {"<": ">"}
 const STRING_CLOSERS = {"\"": "\"", "\'": "\'"}
 var SPACE = PackedByteArray([0])
@@ -11,22 +12,23 @@ var TAB = PackedByteArray([0])
 var ENTER = PackedByteArray([0])
 
 var consts: Dictionary = {}
-var beats: Array = []
+var current_beat: String
 var line: int = 0
 var column: int = 0
 var pos: int = 0
 var code: String
 var current_file: String
 
+var line_column_modifiers = {}
 var imported: Array[String] = []
-var errors: Array = []
+var errors: Array[Dictionary] = []
 var result: GDramaResource = GDramaResource.new()
 
 
 func _init():
 	SPACE.encode_u8(0, 32) # Space
 	TAB.encode_u8(0, 13) # Carriage return
-	ENTER.encode_u8(0, 10) # Line feed
+	ENTER.encode_u8(0, 10) # Line feed 
 
 
 # ------------------------------------------------------------------------------
@@ -37,8 +39,93 @@ func compile(path: String):
 	
 	current_file = path
 	code = FileAccess.open(path, FileAccess.READ).get_as_text()
+	
+	replace_consts()
 	read_beats()
-	pass
+	
+	go_to_start()
+	advance_empty_spaces()
+	while pos < len(code):
+		# Handle call
+		var call_handled = false
+		if is_character_in_pos("<"):
+			var old_values = get_parsing_values()
+			call_handled = true
+			
+			var call = parse_call()
+			match call[0]:
+				"const": # Already parsed
+					pass
+				"import": # Already parsed
+					pass
+				"beat":
+					current_beat = call[1]
+				"choice":
+					var choice = {"type": GDramaResource.CHOICE, "choices": [], "results": [], "conditions": []}
+					while true:
+						if len(call) == 3:
+							call.append(["get_true"])
+						check_arg_count(call, 3)
+						choice["choices"].append(call[1])
+						choice["results"].append(call[2])
+						choice["conditions"].append(call[3])
+						
+						old_values = get_parsing_values()
+						advance_empty_spaces()
+						if is_character_in_pos("<"):
+							call = parse_call()
+							if not call[0] == "choice":
+								set_parsing_values(old_values)
+								break
+						else:
+							break
+					result.beats[current_beat].append(choice)
+				"end":
+					if len(call) == 1:
+						call.append("")
+					check_arg_count(call, 2)
+					result.beats[current_beat].append({"type": GDramaResource.END, "info": call[1]})
+				_:
+					set_parsing_values(old_values)
+					call_handled = false
+		
+		# Parse direction
+		if not call_handled: 
+			var direction = {"type": GDramaResource.DIRECTION, "actor": [], "specification": []}
+			var dir = parse_direction()
+			if is_character_in_pos(":"): # Actor definition
+				direction["actor"] = dir
+				advance_pos()
+				direction["specification"] = parse_direction(true)
+			else:
+				direction["specification"] = dir
+			result.beats[current_beat].append(direction)
+		
+		advance_empty_spaces()
+
+
+## Returns the line divided into strings and calls
+func parse_direction(actor_defined: bool = false) -> Array:
+	# Skip empty spaces
+	while code[pos].to_utf8_buffer() in [SPACE, TAB]:
+		advance_pos()
+	
+	var element_pos = pos
+	var direction: Array = []
+	while code[pos].to_utf8_buffer() != ENTER and pos < len(code) and (not is_character_in_pos(":") or actor_defined):
+		if is_character_in_pos("<"): # Add call
+			if pos > element_pos: # Add past string
+				direction.append(remove_escapes(code.substr(element_pos, pos - element_pos), DIRECTION_ESCAPABLES))
+				element_pos = pos
+			direction.append(parse_call(true))
+			element_pos = pos
+		else:
+			advance_pos()
+	
+	if pos > element_pos: # Add past string
+		direction.append(remove_escapes(code.substr(element_pos, pos - element_pos), DIRECTION_ESCAPABLES))
+	
+	return direction
 
 
 ## Fills the beats array with all beats present in code
@@ -49,7 +136,9 @@ func read_beats() -> void:
 			var call = parse_call()
 			if call[0] == "beat":
 				check_arg_count(call, 1)
-				beats.append(call[1])
+				if result.start == "":
+					result.start = call[1]
+				result.beats[call[1]] = []
 		advance_until("<")
 
 
@@ -60,15 +149,16 @@ func replace_consts() -> void:
 		process_const_line()
 		if is_character_in_pos("$"):
 			var start = pos
+			var start_column = column
 			var name
 			advance_pos()
 			
 			# Get constant name
 			if is_any_character_in_pos(STRING_CLOSERS.keys()): # Is string
 				name = parse_string()
-			else:
+			else: # Is name
 				var name_start = pos
-				while not is_empty_space():
+				while not is_empty_space() and not is_any_character_in_pos(CALL_ESCAPABLES):
 					advance_pos()
 				
 				if pos == name_start:
@@ -76,6 +166,18 @@ func replace_consts() -> void:
 				else:
 					name = code.substr(name_start, pos - name_start)
 			
+			# Replace constant
+			if not name in consts:
+				add_error("Unrecognized constant " + name)
+			else:
+				code = code.substr(0, start) + consts[name] + code.substr(pos)
+				
+				if not line in line_column_modifiers: # Create modifier
+					line_column_modifiers[line] = {}
+				if not column in line_column_modifiers[line]:
+					line_column_modifiers[line][start_column + len(consts[name])] = 0
+				line_column_modifiers[line][start_column + len(consts[name])] += column - start_column - len(consts[name])
+		advance_pos()
 
 
 ## Imports consts from given GDrama file
@@ -84,6 +186,7 @@ func import_consts(path: String) -> void:
 		add_error("Import file doesn't exist")
 		return
 	
+	var old_values = get_parsing_values()
 	imported.append(path)
 	current_file = path
 	code = FileAccess.open(path, FileAccess.READ).get_as_text()
@@ -91,6 +194,7 @@ func import_consts(path: String) -> void:
 	while pos < len(code):
 		process_const_line()
 		advance_until("<")
+	set_parsing_values(old_values)
 
 
 func process_const_line():
@@ -102,9 +206,7 @@ func process_const_line():
 					if call[1] in imported:
 						add_error("Attempted cyclical import")
 					else:
-						var old_values = get_parsing_values()
 						import_consts(call[1])
-						set_parsing_values(old_values)
 				"const":
 					check_arg_count(call, 2)
 					if call[1] in consts:
@@ -113,7 +215,7 @@ func process_const_line():
 						consts[call[1]] = call[2]
 
 
-## Parses a string starting in pos. Returns the full string
+## Parses a string starting in pos. Returns the full string. Ends at last "
 func parse_string() -> String:
 	assert(is_any_character_in_pos(STRING_CLOSERS.keys()), "Called parse_string outside string start")
 	var closer = STRING_CLOSERS[code[pos]]
@@ -242,12 +344,29 @@ func advance_until(x: String) -> void:
 			break
 
 
+func get_modified_column() -> int:
+	var modified_column = column
+	if line in line_column_modifiers:
+		for line_column in line_column_modifiers[line]:
+			if column > line_column:
+				modified_column += line_column_modifiers[line][line_column]
+	return modified_column
+
+
 func add_error(error: String) -> void:
 	errors.append({
 		"line_number": line,
-		"column_number": column,
+		"column_number": get_modified_column(),
 		"error": error
 	})
+
+
+func get_errors() -> Array[Dictionary]:
+	return errors
+
+
+func get_result() -> GDramaResource:
+	return result
 
 
 ## Checks if a specific character is in a position, ignoring it in the case it 
@@ -256,7 +375,7 @@ func is_character_in_pos(char: String) -> bool:
 	var escape_escaped = false
 	if pos - 2 >= 0:
 		escape_escaped = code[pos - 2] == "\\"
-	return code[pos] == char and code[max(0, pos - 1)] != "\\" or escape_escaped
+	return code[pos] == char and (code[max(0, pos - 1)] != "\\" or escape_escaped)
 
 
 ## If one of the characters is in the specified position, returns that character.
@@ -473,14 +592,6 @@ static func advance_until_enter(s: String, pos: int) -> int:
 		if pos >= len(s):
 			break
 	return pos
-
-
-# Given a string, returns it with any empty spaces in the borders removed
-static func remove_empty_borders(s: String) -> String:
-	for pos in [0, -1]:
-		while s[pos] in EMPTY:
-			s = remove_from_string(s, pos)
-	return s
 
 
 # Given a line, returns an array [actor, line]. If there's no actor, actor is ""

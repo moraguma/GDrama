@@ -36,11 +36,19 @@ const TYPE_ICONS = [
 ]
 
 
+var import_plugin
+
+
 func _enter_tree():
+	import_plugin = GDramaImportPlugin.new()
+	import_plugin.editor_plugin = self
+	add_import_plugin(import_plugin)
+	
 	for i in range(len(TYPE_NAMES)):
 		add_custom_type(TYPE_NAMES[i], TYPE_BASES[i], TYPE_SCRIPTS[i], TYPE_ICONS[i])
 
 
 func _exit_tree():
+	remove_import_plugin(import_plugin)
 	for name in TYPE_NAMES:
 		remove_custom_type(name)
