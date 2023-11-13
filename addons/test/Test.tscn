@@ -2,5 +2,9 @@
 
 [ext_resource type="Script" path="res://addons/test/Test.gd" id="1_xilno"]
 
-[node name="Test" type="Node"]
+[node name="Test" type="CodeEdit"]
 script = ExtResource("1_xilno")
+
+[node name="TextEdit" type="TextEdit" parent="."]
+offset_right = 8.0
+offset_bottom = 8.0

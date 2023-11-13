@@ -1,22 +1,22 @@
 <import res://resources/import_test.gdrama>
 
 <beat Start>
-    Tom: Hi! {test hi}
-    Tom: Hey! (wait 0.5)Over here!(wave) $a
-    Tom: This is an example scene
-    Tom: [wave]What do you think?
+	Tom: Hi! {test hi}
+	Tom: Hey! (wait 0.5)Over here!(wave) $a
+	Tom: This is an example scene
+	Tom: [wave]What do you think?
 
-    <choice "I like it!" Like>
-    <choice "Not a huge fan" Dislike>
+	<choice "I like it!" Like>
+	<choice "Not a huge fan" Dislike>
 
 <beat Like>
-    Tom: Well, I'm glad!
-    <jump End>
+	Tom: Well, I'm glad!
+	<jump End>
 
 <beat Dislike>
-    Tom: That's a shame
-    <jump End>
+	Tom: That's a shame
+	<jump End>
 
 <beat End>
-    Tom: Anyway, I have to go
-    <end "Regular ending">
+	Tom: Anyway, I have to go
+	<end "Regular ending">

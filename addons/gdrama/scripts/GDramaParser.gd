@@ -1,9 +1,15 @@
 extends Resource
-class_name GDramaCompiler
+class_name GDramaParser
 
 # --------------------------------------------------------------------------------------------------
 # CONSTANTS
 # --------------------------------------------------------------------------------------------------
+const REGULAR_COLOR = Color("#cdcfd2")
+const KEYWORD_COLOR = Color("#ff7085")
+const ACTOR_COLOR = Color("#a3a3f5")
+const CALL_COLOR = Color("#abc9ff")
+const CONST_COLOR = Color("#63c259")
+
 const DIRECTION_ESCAPABLES: Array[String] = ["$", ":", "<", ">"]
 const CALL_ESCAPABLES: Array[String] = ["\"", "\'", "<", ">", "$"]
 const STRING_ESCAPABLES: Array[String]= ["\"", "\'", "$"]
@@ -16,6 +22,7 @@ var ENTER = PackedByteArray([0])
 # --------------------------------------------------------------------------------------------------
 # VARIABLES
 # --------------------------------------------------------------------------------------------------
+var line_colors = null
 var line_column_modifiers = {}
 
 var line: int = 0
@@ -39,12 +46,12 @@ func _init():
 
 
 # ------------------------------------------------------------------------------
-# COMPILATION
+# PARSING
 # ------------------------------------------------------------------------------
 ## Creates a corresponding GDramaResource from the file in the given path. 
 ## The result of this process can be acessed through get_result
-func compile(path: String):
-	assert(FileAccess.file_exists(path), "Attempted to compile inexistent file")
+func parse(path: String):
+	assert(FileAccess.file_exists(path), "Attempted to parse inexistent file")
 	
 	current_file = path
 	code = FileAccess.open(path, FileAccess.READ).get_as_text()
@@ -260,7 +267,7 @@ func parse_call(subcalled: bool = false) -> Array:
 		return pos
 	
 	# While call isn't over
-	while not is_character_in_pos(closer):
+	while pos < len(code) and not is_character_in_pos(closer):
 		var old_element_pos = element_pos
 		if code[pos].to_utf8_buffer() == ENTER:
 			add_error("Command missing closer \"" + closer + "\"")
@@ -337,9 +344,22 @@ func advance_empty_spaces() -> void:
 			break
 
 
+func advance_until_enter() -> void:
+	if pos >= len(code):
+		return
+	
+	while code[pos].to_utf8_buffer() != ENTER:
+		advance_pos()
+		if pos >= len(code):
+			break
+
+
 ## Checks if a specific character is in a position, ignoring it in the case it 
 ## is escaped
 func is_character_in_pos(char: String) -> bool:
+	if pos >= len(code):
+		return false
+	
 	var escape_escaped = false
 	if pos - 2 >= 0:
 		escape_escaped = code[pos - 2] == "\\"
@@ -372,11 +392,12 @@ func advance_until(x: String) -> void:
 
 ## Advances pos, column and line
 func advance_pos() -> void:
-	pos += 1
-	column += 1
-	if code[pos - 1].to_utf8_buffer() == ENTER:
-		line += 1
-		column = 0
+	if pos < len(code):
+		pos += 1
+		column += 1
+		if code[pos - 1].to_utf8_buffer() == ENTER:
+			line += 1
+			column = 0
 
 # --------------------------------------------------------------------------------------------------
 # ERRORS
@@ -413,6 +434,66 @@ func get_result() -> GDramaResource:
 func check_arg_count(l: Array, total_args: int):
 	if len(l) - 1 != total_args:
 		add_error(str(total_args) + " arguments expected in " + l[0] + " function. " + str(len(l) - 1) + "provided")
+
+# --------------------------------------------------------------------------------------------------
+# COLORS
+# --------------------------------------------------------------------------------------------------
+func get_highlight(text: String):
+	var found_actor = false
+	var color = {0: {"color": REGULAR_COLOR if found_actor else ACTOR_COLOR}}
+	code = text
+	go_to_start()
+	
+	advance_empty_spaces()
+	while pos < len(code):
+		if is_character_in_pos("<"):
+			var old_values = get_parsing_values()
+			var call = parse_call()
+			
+			if len(call) == 0: # Initial call
+				call.append("invalid")
+			var keyword_call = call[0] in ["beat", "const", "import", "choice", "end"]
+			set_parsing_values(old_values)
+			color[pos] = {"color": KEYWORD_COLOR if keyword_call else CALL_COLOR}
+			
+			advance_pos()
+			
+			if pos < len(code):
+				var opener_count = 1
+				while opener_count > 0:
+					if is_character_in_pos("<"):
+						opener_count += 1
+						color[pos] = {"color": CALL_COLOR}
+					elif is_character_in_pos(">"):
+						opener_count -= 1
+						if opener_count == 1 and keyword_call:
+							color[pos] = {"color": KEYWORD_COLOR}
+					advance_pos()
+					if pos >= len(code):
+						break
+				color[pos] = {"color": REGULAR_COLOR if found_actor else ACTOR_COLOR}
+		elif is_character_in_pos("$"):
+			color[pos] = {"color": CONST_COLOR}
+			advance_pos()
+			
+			if pos < len(code):
+				if is_any_character_in_pos(STRING_CLOSERS.keys()):
+					parse_string()
+				else:
+					while not code[pos].to_utf8_buffer() in [SPACE, ENTER, TAB]:
+						advance_pos()
+						if pos >= len(code):
+							break
+				color[pos] = {"color": REGULAR_COLOR if found_actor else ACTOR_COLOR}
+		else:
+			if is_character_in_pos(":"):
+				found_actor = true
+				advance_pos()
+				if pos < len(code):
+					color[pos] = {"color": REGULAR_COLOR}
+			else:
+				advance_pos()
+	return color
 
 
 # --------------------------------------------------------------------------------------------------

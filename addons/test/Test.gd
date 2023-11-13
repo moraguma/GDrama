@@ -1,6 +1,6 @@
-extends Node
+extends CodeEdit
 
 
 func _ready():
-	var t = GDramaCompiler.new()
+	var t = GDramaParser.new()
 	t.compile("res://resources/dramas/example.gdrama")

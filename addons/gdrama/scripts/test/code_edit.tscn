@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://cq6c0mgbjetc1"]
+
+[ext_resource type="Script" path="res://addons/gdrama/scripts/test/CodeEdit.gd" id="1_tbmk7"]
+
+[node name="CodeEdit" type="CodeEdit"]
+offset_right = 1920.0
+offset_bottom = 1088.0
+script = ExtResource("1_tbmk7")

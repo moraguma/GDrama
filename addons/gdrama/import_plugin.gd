@@ -65,11 +65,11 @@ func _import(source_file: String, save_path: String, options: Dictionary, platfo
 	if not FileAccess.file_exists(source_file): return ERR_FILE_NOT_FOUND
 	
 	# Parse the text
-	var compiler: GDramaCompiler = GDramaCompiler.new()
-	compiler.compile(source_file)
-	var result: GDramaResource = compiler.get_result()
-	var errors: Array[Dictionary] = compiler.get_errors()
-	compiler.free()
+	var parser: GDramaParser = GDramaParser.new()
+	parser.compile(source_file)
+	var result: GDramaResource = parser.get_result()
+	var errors: Array[Dictionary] = parser.get_errors()
+	parser.free()
 
 	if len(errors) > 0:
 		printerr("%d errors found in %s" % [len(errors), source_file])
