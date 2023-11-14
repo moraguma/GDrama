@@ -35,12 +35,15 @@ const TYPE_ICONS = [
 	preload("res://addons/gdrama/icons/DramaInterface.png")
 ]
 
-
 var import_plugin
+var og_textfile_extensions
 
 
 func _enter_tree():
 	if Engine.is_editor_hint():
+		og_textfile_extensions = get_editor_interface().get_editor_settings().get_setting("docks/filesystem/textfile_extensions")
+		get_editor_interface().get_editor_settings().set_setting("docks/filesystem/textfile_extensions", og_textfile_extensions + ",gdrama")
+		
 		var gdrama_syntax_highlighter: GDramaSyntaxHighlighter = GDramaSyntaxHighlighter.new()
 		get_editor_interface().get_script_editor().register_syntax_highlighter(gdrama_syntax_highlighter)
 		
@@ -53,6 +56,9 @@ func _enter_tree():
 
 
 func _exit_tree():
-	remove_import_plugin(import_plugin)
-	for name in TYPE_NAMES:
-		remove_custom_type(name)
+	if Engine.is_editor_hint():
+		get_editor_interface().get_editor_settings().set_setting("docks/filesystem/textfile_extensions", og_textfile_extensions)
+		
+		remove_import_plugin(import_plugin)
+		for name in TYPE_NAMES:
+			remove_custom_type(name)

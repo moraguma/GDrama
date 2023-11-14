@@ -66,16 +66,16 @@ func _import(source_file: String, save_path: String, options: Dictionary, platfo
 	
 	# Parse the text
 	var parser: GDramaParser = GDramaParser.new()
-	parser.compile(source_file)
+	var err = parser.parse(source_file)
 	var result: GDramaResource = parser.get_result()
 	var errors: Array[Dictionary] = parser.get_errors()
-	parser.free()
 
-	if len(errors) > 0:
+	if err != OK:
 		printerr("%d errors found in %s" % [len(errors), source_file])
-		# TODO - Display errors
-		return FAILED
+		for error in errors:
+			printerr("%s @ %d:%d" % [error["error"], error["line_number"], error["column_number"]])
+		return err
 	
-	var err = ResourceSaver.save(result, "%s.%s" % [save_path, _get_save_extension()])
+	err = ResourceSaver.save(result, "%s.%s" % [save_path, _get_save_extension()])
 	compiled_resource.emit(result)
 	return err

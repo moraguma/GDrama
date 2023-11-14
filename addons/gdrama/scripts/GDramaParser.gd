@@ -7,7 +7,7 @@ class_name GDramaParser
 const REGULAR_COLOR = Color("#cdcfd2")
 const KEYWORD_COLOR = Color("#ff7085")
 const ACTOR_COLOR = Color("#a3a3f5")
-const CALL_COLOR = Color("#abc9ff")
+const CALL_COLOR = Color("#ff8ccc")
 const CONST_COLOR = Color("#63c259")
 
 const DIRECTION_ESCAPABLES: Array[String] = ["$", ":", "<", ">"]
@@ -50,7 +50,7 @@ func _init():
 # ------------------------------------------------------------------------------
 ## Creates a corresponding GDramaResource from the file in the given path. 
 ## The result of this process can be acessed through get_result
-func parse(path: String):
+func parse(path: String) -> Error:
 	assert(FileAccess.file_exists(path), "Attempted to parse inexistent file")
 	
 	current_file = path
@@ -60,6 +60,7 @@ func parse(path: String):
 	read_beats()
 	
 	go_to_start()
+	
 	advance_empty_spaces()
 	while pos < len(code):
 		# Handle call
@@ -75,8 +76,14 @@ func parse(path: String):
 				"import": # Already parsed
 					pass
 				"beat":
+					if current_beat != "":
+						result.beats[current_beat]["next"] = call[1]
+					
 					current_beat = call[1]
 				"choice":
+					if not is_inside_beat("choice"):
+						return FAILED
+					
 					var choice = {"type": GDramaResource.CHOICE, "choices": [], "results": [], "conditions": []}
 					while true:
 						if len(call) == 3:
@@ -95,18 +102,24 @@ func parse(path: String):
 								break
 						else:
 							break
-					result.beats[current_beat].append(choice)
+					result.beats[current_beat]["lines"].append(choice)
 				"end":
+					if not is_inside_beat("end"):
+						return FAILED
+					
 					if len(call) == 1:
 						call.append("")
 					check_arg_count(call, 2)
-					result.beats[current_beat].append({"type": GDramaResource.END, "info": call[1]})
+					result.beats[current_beat]["lines"].append({"type": GDramaResource.END, "info": call[1]})
 				_:
 					set_parsing_values(old_values)
 					call_handled = false
 		
 		# Parse direction
 		if not call_handled: 
+			if not is_inside_beat("direction"):
+				return FAILED
+			
 			var direction = {"type": GDramaResource.DIRECTION, "actor": [], "specification": []}
 			var dir = parse_direction()
 			if is_character_in_pos(":"): # Actor definition
@@ -115,9 +128,10 @@ func parse(path: String):
 				direction["specification"] = parse_direction(true)
 			else:
 				direction["specification"] = dir
-			result.beats[current_beat].append(direction)
+			result.beats[current_beat]["lines"].append(direction)
 		
 		advance_empty_spaces()
+	return OK
 
 
 ## Fills the beats array with all beats present in code
@@ -130,7 +144,7 @@ func read_beats() -> void:
 				check_arg_count(call, 1)
 				if result.start == "":
 					result.start = call[1]
-				result.beats[call[1]] = []
+				result.beats[call[1]] = {"lines": [], "next": ""}
 		advance_until("<")
 
 
@@ -329,6 +343,9 @@ func set_parsing_values(values: Array):
 
 ## Returns whether the current pos is at a space, tab or enter
 func is_empty_space() -> bool:
+	if pos >= len(code):
+		return false
+	
 	return code[pos].to_utf8_buffer() in [SPACE, TAB, ENTER]
 
 
@@ -429,6 +446,13 @@ func get_result() -> GDramaResource:
 	return result
 
 
+func is_inside_beat(type: String) -> bool:
+	if current_beat == "":
+		add_error("Attempted to create " + type + " outside beat")
+		return false
+	return true
+
+
 ## If the argument array passed contains a different number of arguments than
 ## expected, pushes an error message
 func check_arg_count(l: Array, total_args: int):
@@ -493,6 +517,12 @@ func get_highlight(text: String):
 					color[pos] = {"color": REGULAR_COLOR}
 			else:
 				advance_pos()
+	
+	if not found_actor:
+		for pos in color:
+			if color[pos]["color"] == ACTOR_COLOR:
+				color[pos]["color"] = REGULAR_COLOR
+	
 	return color
 
 

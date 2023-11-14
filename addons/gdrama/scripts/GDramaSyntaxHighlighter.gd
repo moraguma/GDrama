@@ -11,3 +11,6 @@ func _get_line_syntax_highlighting(line):
 func _get_name():
 	return "GDrama"
 
+
+func _get_supported_languages():
+	return PackedStringArray(["gdrama"])

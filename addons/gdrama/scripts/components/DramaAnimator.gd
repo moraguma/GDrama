@@ -24,12 +24,6 @@ signal drama_call(method_name: String, args: Array)
 
 
 # --------------------------------------------------------------------------------------------------
-# CONSTANTS
-# --------------------------------------------------------------------------------------------------
-const ESCAPABLES = ["(", ")"]
-
-
-# --------------------------------------------------------------------------------------------------
 # VARIABLES
 # --------------------------------------------------------------------------------------------------
 var is_typing = false
@@ -46,67 +40,46 @@ func _ready():
 	add_child(text_timer)
 
 
-# Animates the given string. Uses the label to display text if it's available
-func animate(s: String):
+# Animates the given direction. Uses the label to display text if it's available
+func animate(steps: Array):
 	is_typing = true
 	
-	# Generates steps as a list of texts and calls
-	var steps = []
-	var raw_text = s
-	var pos = 0
-	
-	while pos < len(raw_text):
-		if raw_text[pos] == "\\" and raw_text[min(pos + 1, len(raw_text))] in ESCAPABLES:
-			raw_text = GDramaTranspiler.remove_from_string(raw_text, pos)
-			pos += 1
-		elif raw_text[pos] == "(" and raw_text[max(pos - 1, 0)] != "\\":
-			var call = GDramaTranspiler.parse_call(raw_text, pos)
-			steps.append({"type": "CALL", "call": call})
-			
-			if len(steps) >= 2: # Removes empty text if present
-				if steps[-2]["type"] == "TEXT":
-					if steps[-2]["size"] == 0:
-						steps.remove_at(len(steps) - 2)
-			
-			raw_text = raw_text.substr(0, pos) + raw_text.substr(GDramaTranspiler.advance_until(raw_text, pos, ")") + 1)
-		
-		var new_pos = GDramaTranspiler.advance_until(raw_text, pos, "(")
-		steps.append({"type": "TEXT", "size": new_pos - pos})
-		pos = new_pos
-	
+	# Define raw_text
+	var raw_text = ""
+	for step in steps:
+		if not step is Array:
+			raw_text.append(step)
 	set_raw_text.emit(raw_text)
 	
-	# Animates calls and texts
-	var total_pos = 0
-	var step_pos = 0
-	var current_step = 0
-	while current_step < len(steps):
-		match steps[current_step]["type"]:
-			"CALL":
-				var method_name = steps[current_step]["call"][0]
-				var args = steps[current_step]["call"].slice(1)
-				
-				drama_call.emit(method_name, args)
-				if has_method(method_name):
-					if is_typing:
-						await callv(method_name, args)
-					else:
-						callv(method_name, args)
-			"TEXT":
+	# Animation
+	for step in steps:
+		if step is Array: # Call processing
+			var method_name = step[0]
+			var args = step.slice(1)
+			
+			drama_call.emit(method_name, args)
+			if has_method(method_name):
 				if is_typing:
-					var text_pos = 0
-					while text_pos < steps[current_step]["size"]:
-						spoke.emit(raw_text[total_pos])
-						
-						if time_per_char > 0:
-							text_timer.start(time_per_char)
-							await text_timer.timeout
-							if not is_typing:
-								break
-						
-						text_pos += 1
-						total_pos += 1
-		current_step += 1
+					await callv(method_name, args)
+				else:
+					callv(method_name, args)
+		elif is_typing: # Text processing
+			var pos = 0
+			while pos < len(step):
+				# Ignore bbcode
+				pos = advance_bbcode(step, pos)
+				if pos >= len(step):
+					break
+				
+				# Wait for time_per_char
+				spoke.emit(step[pos])
+				if time_per_char > 0:
+					text_timer.start(time_per_char)
+					await text_timer.timeout
+					if not is_typing:
+						break
+				
+				pos += 1
 	
 	is_typing = false
 	direction_ended.emit()
@@ -120,6 +93,24 @@ func skip_animation():
 		text_timer.timeout.emit()
 		text_timer.stop()
 
+
+func advance_bbcode(s: String, pos: int):
+	if is_character_in_pos(s, pos, "["):
+		while not is_character_in_pos(s, pos, "]"):
+			pos += 1
+			if pos >= len(s):
+				break
+	return pos
+
+
+func is_character_in_pos(s: String, pos: int, char: String):
+	if pos >= len(s):
+		return false
+	
+	var escape_escaped = false
+	if pos - 2 >= 0:
+		escape_escaped = s[pos - 2] == "\\"
+	return s[pos] == char and (s[max(0, pos - 1)] != "\\" or escape_escaped)
 # ------------------------------------------------------------------------------
 # GDRAMA METHODS
 # ------------------------------------------------------------------------------

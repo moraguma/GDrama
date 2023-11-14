@@ -2,146 +2,114 @@ extends Resource
 class_name DramaReader
 
 
-var drama: Dictionary
+var drama: GDramaResource
 var beat: String
-var pointer: String
+var pointer: int
 var to_call: Object
 var flags: Dictionary = {}
 
 
-func _init(to_call: Object = self):
-	self.to_call = to_call
+func _init():
+	pass
 
 
-# ------------------------------------------------------------------------------
-# Drama Handling
-# ------------------------------------------------------------------------------
-
-
-# Loads and parses a .drama file. If successful, the drama and pointer variables
-# are updated 
+# --------------------------------------------------------------------------------------------------
+# DRAMA HANDLING
+# --------------------------------------------------------------------------------------------------
+## Loads a .gdrama file. If successful, the drama and pointer variables are 
+## updated 
 func load_gdrama(path: String) -> void:
-	drama = GDramaTranspiler.get_json(FileAccess.open(path, FileAccess.READ).get_as_text())
+	assert(FileAccess.file_exists(path), "Attempted to load inexistent drama at " + path)
+	
+	drama = ResourceLoader.load(path)
+	jump(drama.start)
+
+
+## If the pointer is on a choice, makes the specified choice
+func make_choice(choice: int) -> void:
+	assert(drama != null, "Called make_choice with no drama loaded")
+	
+	var line = drama.beats[beat]["lines"][pointer]
+	assert(line["type"] == GDramaResource.CHOICE, "Called make_choice on non choice line")
+	assert(choice >= 0 and choice < len(line["results"]), "Invalid choice " + str(choice) + " at line " + JSON.stringify(line))
+	jump(line["results"][choice])
+
+
+## Returns drama to first beat
+func reset_drama():
+	assert(drama != null, "Called reset_drama with no drama loaded")
 	jump(drama["start"])
 
 
-# Loads a .json file obtained from parsing a .drama file. If successful, the
-# drama and pointer variables are updated
-func load_json(path: String) -> void:
-	drama = JSON.parse_string(FileAccess.open(path, FileAccess.READ).get_as_text())
-	if drama == null:
-		push_error("Failed to load JSON at " + path)
-	else:
-		jump(drama["start"])
-
-
-# Saves the loaded drama file as a json in the specified path
-func save_json(path: String) -> void:
-	if check_drama():
-		var file = FileAccess.open(path, FileAccess.WRITE)
-		file.store_string(JSON.stringify(drama))
-		file.close()
-
-
-# Returns true if the drama is loaded. If it's not, returns false and pushes an
-# error message
-func check_drama() -> bool:
-	if drama != null:
-		return true
-	push_error("No drama loaded!")
-	return false
-
-
-# If the pointer is on a choice, makes the specified choice
-func make_choice(choice: int) -> void:
-	if check_drama():
-		var line = drama["beats"][beat]["steps"][pointer]
-		if line["type"] == "CHOICE":
-			if choice >= 0 and choice < len(line["results"]):
-				jump(line["results"][choice])
-			else:
-				push_error("Invalid choice " + str(choice) + " at line " + JSON.stringify(line))
-		else:
-			push_error("Current line " + JSON.stringify(line) + " is not a choice!")
-
-
-func reset_drama():
-	if drama != null:
-		jump(drama["start"])
-	else:
-		push_error("Tried to reset drama with no drama loaded!")
-
-
-# Returns the next line and advances the pointer by one. The return is given in
-# the format
+## Returns the next line and advances the pointer by one. The return is a line
+## in the form specified in GDramaResource
 func next_line() -> Dictionary:
-	if check_drama():
-		var result
-		while result == null:
-			if not pointer in drama["beats"][beat]["steps"]:
-				if drama["beats"][beat]["next"] == "":
-					return {"type": "END", "info": ""}
-				jump(drama["beats"][beat]["next"])
-			
-			var line = drama["beats"][beat]["steps"][pointer]
-			
-			match line["type"]:
-				"DIRECTION":
-					pointer = str(int(pointer) + 1)
-					
-					result = replace_commands_in_fields(line, ["actor", "direction"])
-				"CHOICE":
+	assert(drama != null, "Called next_line with no drama loaded")
+	
+	var result
+	while result == null:
+		# If current line is invalid
+		if pointer >= len(drama.beats[beat]["lines"]):
+			if drama.beats[beat]["next"] == "":
+				return {"type": GDramaResource.END, "info": ""}
+			jump(drama.beats[beat]["next"])
+		
+		# Process line
+		var line = drama.beats[beat]["lines"][pointer]
+		match line["type"]:
+			GDramaResource.DIRECTION:
+				pointer = pointer + 1
+				
+				for field in ["actor", "direction"]:
+					process_calls(line[field])
+				if len(line["direction"]) > 0: # If everything was processed, skips
 					result = line.duplicate(true)
-					for i in range(len(result["choices"])):
-						result["choices"][i] = replace_commands(result["choices"][i])
-						
-						var condition = GDramaTranspiler.parse_call(result["conditions"][i], 0)
-						result["conditions"][i] = to_call.callv(condition[0], condition.slice(1))
-				"END":
-					result = line.duplicate(true)
-					result["info"] = replace_commands(result["info"])
-				"CALL":
-					var call = GDramaTranspiler.parse_call(line["call"], 0)
-					to_call.callv(call[0], call.slice(1))
-		return result
-	return {}
+			GDramaResource.CHOICE:
+				result = line.duplicate(true)
+				for i in range(len(result["conditions"])):
+					var call_result = get_call_result(result["conditions"][i])
+					if not call_result is bool:
+						push_warning("Result of call " + result["conditions"] + " is not bool. This may cause unexpected behavior")
+					result["conditions"][i] = call_result
+			GDramaResource.END:
+				result = line.duplicate(true)
+	return result
 
 
-# Returns the string with all DramaReader level commands replaced
-func replace_commands(s: String) -> String:
-	var pos = 0
-	
-	while pos < len(s):
-		if s[pos] == "{" and s[max(pos - 1, 0)] != "\\":
-			var command = GDramaTranspiler.parse_call(s, pos)
-			var new_pos = GDramaTranspiler.advance_until(s, pos, "}")
-			
-			s = s.substr(0, pos) + to_call.callv(command[0], command.slice(1)) + s.substr(new_pos + 1)
-		pos = GDramaTranspiler.advance_until(s, pos, "{")
-	
-	return s
+## Given an array of strings and calls (represented by arrays), processes all
+## calls it can
+func process_calls(a: Array) -> void:
+	for i in len(a):
+		if a[i] is Array:
+			assert(len(a[i]) > 0, "Attempted to process empty call")
+			if has_method(a[i][0]):
+				var r = callv(a[i][0], a[i].slice(1))
+				if r is String:
+					a[i] = r
+				else:
+					a.remove_at(i)
 
 
-# Given a dict and a list of fields, replaces commands in all specified fields
-func replace_commands_in_fields(d: Dictionary, fields: Array[String]) -> Dictionary:
-	for field in fields:
-		d[field] = replace_commands(d[field])
-	
-	return d
+## Processes the call specified by this array and returns its result
+func get_call_result(a: Array):
+	assert(len(a) > 0, "Attempted to process empty call")
+	if has_method(a[0]):
+		return callv(a[0], a.slice(1))
+	return null
 
 
 # ------------------------------------------------------------------------------
-# GDrama Commands
+# COMMANDS
 # ------------------------------------------------------------------------------
 ## Jumps beat and pointer to the start of the specified beat
 func jump(target_beat: String) -> void:
 	beat = target_beat
-	pointer = "0"
+	pointer = 0
 
 
 ## Jumps to target beat if flag is true
 func branch(target_beat: String, flag: String) -> void:
-	pointer = str(int(pointer) + 1)
+	pointer = pointer + 1
 	if flag in flags:
 		if flags[flag]:
 			jump(target_beat)
@@ -150,19 +118,15 @@ func branch(target_beat: String, flag: String) -> void:
 ## Turns on a local flag
 func flag(name: String) -> void:
 	flags[name] = true
-	pointer = str(int(pointer) + 1)
+	pointer = pointer + 1
 
 
 ## Turns off a local flag
 func unflag(name: String) -> void:
 	flags[name] = false
-	pointer = str(int(pointer) + 1)
+	pointer = pointer + 1
 
 
 ## Returns true
 func get_true() -> bool:
 	return true
-
-
-func test(x):
-	return "Test! " + x

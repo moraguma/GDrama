@@ -25,7 +25,7 @@ signal ended_drama(info: String)
 # --------------------------------------------------------------------------------------------------
 # VARIABLES
 # --------------------------------------------------------------------------------------------------
-@onready var drama_reader: DramaReader = DramaReader.new()
+@onready var drama_reader: DramaReader = _get_drama_reader()
 var connected_displays: Array = []
 
 
@@ -34,6 +34,7 @@ var connected_displays: Array = []
 # --------------------------------------------------------------------------------------------------
 func load_gdrama(path: String):
 	drama_reader.load_gdrama(path)
+
 
 ## Connects the signals emitted by this node to the respective functions in the
 ## given DramaDisplay
@@ -109,3 +110,9 @@ func next_line():
 func make_choice(choice: int):
 	drama_reader.make_choice(choice)
 	next_line()
+
+
+## Can be overriden in scripts that inherits from this one to return a custom
+## DramaReader implementation
+func _get_drama_reader() -> DramaReader:
+	return DramaReader.new()

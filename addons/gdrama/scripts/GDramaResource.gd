@@ -11,8 +11,9 @@ const DIRECTION = 2
 ## The name of the beat the drama should start from
 var start: String
 
-## For each beat, we'll have an array of commands and directions. The available
-## ones are:
+## Each beat is includes two keys, being "next" (String) the beat that should be 
+## played immediately after this one, and "lines" being an array of commands and
+## directions. The available ones are:
 ##
 ## {"type": CHOICE, "choices": [], "results": [], "conditions": []} -> In order,
 ## we have the text associated with each choice, the resulting beat of each one

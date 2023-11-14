@@ -1,0 +1,14 @@
+[remap]
+
+importer="gdrama_importer"
+type="Resource"
+uid="uid://b6jev648cdfyq"
+path="res://.godot/imported/languagetest.gdrama-7b04c533ce42fd056916495c5752ecd9.tres"
+
+[deps]
+
+source_file="res://resources/dramas/languagetest.gdrama"
+dest_files=["res://.godot/imported/languagetest.gdrama-7b04c533ce42fd056916495c5752ecd9.tres"]
+
+[params]
+
