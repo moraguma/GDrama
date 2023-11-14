@@ -9,7 +9,7 @@ const DIRECTION = 2
 
 
 ## The name of the beat the drama should start from
-var start: String
+@export var start: String
 
 ## Each beat is includes two keys, being "next" (String) the beat that should be 
 ## played immediately after this one, and "lines" being an array of commands and
@@ -25,4 +25,4 @@ var start: String
 ## {"type": DIRECTION, "actor": [], "specification": []} -> A direction. Specifies
 ## an actor (which can be blank) and a specifications. Each element of these
 ## lists is either a string or a call specification (an array of strings) 
-var beats: Dictionary = {}
+@export var beats: Dictionary = {}

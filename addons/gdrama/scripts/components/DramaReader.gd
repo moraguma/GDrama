@@ -21,7 +21,7 @@ func _init():
 func load_gdrama(path: String) -> void:
 	assert(FileAccess.file_exists(path), "Attempted to load inexistent drama at " + path)
 	
-	drama = ResourceLoader.load(path)
+	drama = load(path)
 	jump(drama.start)
 
 
