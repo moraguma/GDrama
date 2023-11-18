@@ -96,13 +96,18 @@ func next_or_skip():
 func next_line():
 	var line = drama_reader.next_line()
 	match line["type"]:
-		"CHOICE":
+		GDramaResource.CHOICE:
 			ask_for_choice.emit(line)
-		"END":
+		GDramaResource.END:
 			ended_drama.emit(line["info"])
-		"DIRECTION":
-			set_actor.emit(line["actor"])
-			animate(line["direction"])
+		GDramaResource.DIRECTION:
+			var actor_name = ""
+			for s in line["actor"]:
+				if not s is Array:
+					actor_name += s
+			
+			set_actor.emit(actor_name)
+			animate(line["specification"])
 
 
 ## Makes a choice. Should only be called after an ask_for_choice signal and

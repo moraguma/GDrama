@@ -60,9 +60,9 @@ func next_line() -> Dictionary:
 			GDramaResource.DIRECTION:
 				pointer = pointer + 1
 				
-				for field in ["actor", "direction"]:
+				for field in ["actor", "specification"]:
 					process_calls(line[field])
-				if len(line["direction"]) > 0: # If everything was processed, skips
+				if len(line["specification"]) > 0: # If everything was processed, skips
 					result = line.duplicate(true)
 			GDramaResource.CHOICE:
 				result = line.duplicate(true)

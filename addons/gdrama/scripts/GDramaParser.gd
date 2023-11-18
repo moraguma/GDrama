@@ -18,6 +18,7 @@ const STRING_CLOSERS = {"\"": "\"", "\'": "\'"}
 var SPACE = PackedByteArray([0])
 var TAB = PackedByteArray([0])
 var ENTER = PackedByteArray([0])
+var CHAR_TAB = PackedByteArray([0])
 
 # --------------------------------------------------------------------------------------------------
 # VARIABLES
@@ -42,6 +43,7 @@ var result: GDramaResource = GDramaResource.new()
 func _init():
 	SPACE.encode_u8(0, 32) # Space
 	TAB.encode_u8(0, 13) # Carriage return
+	CHAR_TAB.encode_u8(0, 9) # Character tabulation
 	ENTER.encode_u8(0, 10) # Line feed 
 
 
@@ -225,7 +227,7 @@ func process_const_line():
 ## Returns the line divided into strings and calls
 func parse_direction(actor_defined: bool = false) -> Array:
 	# Skip empty spaces
-	while code[pos].to_utf8_buffer() in [SPACE, TAB]:
+	while code[pos].to_utf8_buffer() in [SPACE, TAB, CHAR_TAB]:
 		advance_pos()
 	
 	var element_pos = pos
@@ -233,8 +235,16 @@ func parse_direction(actor_defined: bool = false) -> Array:
 	while code[pos].to_utf8_buffer() != ENTER and pos < len(code) and (not is_character_in_pos(":") or actor_defined):
 		if is_character_in_pos("<"): # Add call
 			if pos > element_pos: # Add past string
-				direction.append(remove_escapes(code.substr(element_pos, pos - element_pos), DIRECTION_ESCAPABLES))
-				element_pos = pos
+				var all_white_spaces = true # Only adds if string has at least one non empty space
+				for i in range(element_pos, pos):
+					print(code[i].to_utf8_buffer())
+					if not code[i].to_utf8_buffer() in [SPACE, TAB, CHAR_TAB]:
+						all_white_spaces = false
+						break
+				
+				if not all_white_spaces:
+					direction.append(remove_escapes(code.substr(element_pos, pos - element_pos), DIRECTION_ESCAPABLES))
+					element_pos = pos
 			direction.append(parse_call(true))
 			element_pos = pos
 		else:
@@ -346,7 +356,7 @@ func is_empty_space() -> bool:
 	if pos >= len(code):
 		return false
 	
-	return code[pos].to_utf8_buffer() in [SPACE, TAB, ENTER]
+	return code[pos].to_utf8_buffer() in [SPACE, TAB, CHAR_TAB, ENTER]
 
 
 ## Advances empty spaces in s starting from pos until pos is at a non-empty
@@ -504,7 +514,7 @@ func get_highlight(text: String):
 				if is_any_character_in_pos(STRING_CLOSERS.keys()):
 					parse_string()
 				else:
-					while not code[pos].to_utf8_buffer() in [SPACE, ENTER, TAB]:
+					while not code[pos].to_utf8_buffer() in [SPACE, ENTER, TAB, CHAR_TAB]:
 						advance_pos()
 						if pos >= len(code):
 							break

@@ -48,7 +48,7 @@ func animate(steps: Array):
 	var raw_text = ""
 	for step in steps:
 		if not step is Array:
-			raw_text.append(step)
+			raw_text += step
 	set_raw_text.emit(raw_text)
 	
 	# Animation
