@@ -64,6 +64,7 @@ func animate(steps: Array):
 				else:
 					callv(method_name, args)
 		elif is_typing: # Text processing
+			step = remove_bbcode(step)
 			var pos = 0
 			while pos < len(step):
 				# Ignore bbcode
@@ -93,6 +94,21 @@ func skip_animation():
 		text_timer.timeout.emit()
 		text_timer.stop()
 
+
+## Returns the given string with bbcode removed
+func remove_bbcode(s: String):
+	var pos = 0
+	while pos < len(s):
+		if is_character_in_pos(s, pos, "["):
+			var start_pos = pos
+			while not is_character_in_pos(s, pos, "]"):
+				pos += 1
+				if pos >= len(s):
+					break
+			if is_character_in_pos(s, pos, "]"):
+				s = s.substr(0, start_pos) + s.substr(pos + 1)
+		pos += 1
+	return s
 
 func advance_bbcode(s: String, pos: int):
 	if is_character_in_pos(s, pos, "["):

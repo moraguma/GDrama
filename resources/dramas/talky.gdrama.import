@@ -1,0 +1,14 @@
+[remap]
+
+importer="gdrama_importer"
+type="Resource"
+uid="uid://d10ubrwraa8c3"
+path="res://.godot/imported/talky.gdrama-5a873a849cffb9735cc1331b53a9ea06.tres"
+
+[deps]
+
+source_file="res://resources/dramas/talky.gdrama"
+dest_files=["res://.godot/imported/talky.gdrama-5a873a849cffb9735cc1331b53a9ea06.tres"]
+
+[params]
+
