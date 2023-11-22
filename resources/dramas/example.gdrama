@@ -1,5 +1,3 @@
-<const T Talky:>
-
 <beat Start>
 	<branch HasTalked talked>
 	<flag talked>

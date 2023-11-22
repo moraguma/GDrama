@@ -75,6 +75,8 @@ func _import(source_file: String, save_path: String, options: Dictionary, platfo
 		for error in errors:
 			printerr("%s @ %d:%d" % [error["error"], error["line_number"], error["column_number"]])
 		return err
+	else:
+		print("Successfully imported GDrama @ %s" % [source_file])
 	
 	err = ResourceSaver.save(result, "%s.%s" % [save_path, _get_save_extension()])
 	compiled_resource.emit(result)

@@ -55,7 +55,7 @@ func next_line() -> Dictionary:
 			jump(drama.beats[beat]["next"])
 		
 		# Process line
-		var line = drama.beats[beat]["lines"][pointer]
+		var line = drama.beats[beat]["lines"][pointer].duplicate(true)
 		match line["type"]:
 			GDramaResource.DIRECTION:
 				pointer = pointer + 1
@@ -63,23 +63,24 @@ func next_line() -> Dictionary:
 				for field in ["actor", "specification"]:
 					process_calls(line[field])
 				if len(line["specification"]) > 0: # If everything was processed, skips
-					result = line.duplicate(true)
+					result = line
 			GDramaResource.CHOICE:
-				result = line.duplicate(true)
+				result = line
 				for i in range(len(result["conditions"])):
 					var call_result = get_call_result(result["conditions"][i])
 					if not call_result is bool:
 						push_warning("Result of call " + result["conditions"] + " is not bool. This may cause unexpected behavior")
 					result["conditions"][i] = call_result
 			GDramaResource.END:
-				result = line.duplicate(true)
+				result = line
 	return result
 
 
 ## Given an array of strings and calls (represented by arrays), processes all
 ## calls it can
 func process_calls(a: Array) -> void:
-	for i in len(a):
+	var i = 0
+	while i < len(a):
 		if a[i] is Array:
 			assert(len(a[i]) > 0, "Attempted to process empty call")
 			if has_method(a[i][0]):
@@ -88,6 +89,8 @@ func process_calls(a: Array) -> void:
 					a[i] = r
 				else:
 					a.remove_at(i)
+					i -= 1
+		i += 1
 
 
 ## Processes the call specified by this array and returns its result
@@ -109,7 +112,6 @@ func jump(target_beat: String) -> void:
 
 ## Jumps to target beat if flag is true
 func branch(target_beat: String, flag: String) -> void:
-	pointer = pointer + 1
 	if flag in flags:
 		if flags[flag]:
 			jump(target_beat)
@@ -118,13 +120,11 @@ func branch(target_beat: String, flag: String) -> void:
 ## Turns on a local flag
 func flag(name: String) -> void:
 	flags[name] = true
-	pointer = pointer + 1
 
 
 ## Turns off a local flag
 func unflag(name: String) -> void:
 	flags[name] = false
-	pointer = pointer + 1
 
 
 ## Returns true

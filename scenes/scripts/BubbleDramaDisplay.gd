@@ -62,10 +62,10 @@ func _physics_process(delta):
 				display_choice()
 				display(current_choice_data[current_choice], "", false)
 			elif Input.is_action_just_pressed("talk"):
-				drama_player.make_choice(current_choice_values[current_choice])
+				drama_player.call_deferred("make_choice", current_choice_values[current_choice])
 				current_choice_data = null
 		elif Input.is_action_just_pressed("talk"):
-				drama_player.next_or_skip()
+				drama_player.call("next_or_skip")
 
 
 ## Finishes typing
@@ -223,6 +223,6 @@ func stop_scamper(actor: String):
 		char.stop_scamper()
 
 
-func jump(actor: String):
+func hop(actor: String):
 	if actor_name == actor:
 		char.jump()

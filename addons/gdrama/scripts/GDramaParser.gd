@@ -237,7 +237,6 @@ func parse_direction(actor_defined: bool = false) -> Array:
 			if pos > element_pos: # Add past string
 				var all_white_spaces = true # Only adds if string has at least one non empty space
 				for i in range(element_pos, pos):
-					print(code[i].to_utf8_buffer())
 					if not code[i].to_utf8_buffer() in [SPACE, TAB, CHAR_TAB]:
 						all_white_spaces = false
 						break
