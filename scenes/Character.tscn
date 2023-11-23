@@ -1,8 +1,10 @@
-[gd_scene load_steps=10 format=3 uid="uid://p8v6t6buk0ge"]
+[gd_scene load_steps=12 format=3 uid="uid://p8v6t6buk0ge"]
 
 [ext_resource type="Script" path="res://scenes/scripts/Character.gd" id="1_uc1gm"]
 [ext_resource type="Texture2D" uid="uid://dweoiradnaxsj" path="res://resources/sprites/Player.png" id="2_qxeo3"]
 [ext_resource type="PackedScene" uid="uid://b316yvhfet7b3" path="res://scenes/BubbleDramaDisplay.tscn" id="3_7y6n5"]
+[ext_resource type="AudioStream" uid="uid://c8exrsi0y214e" path="res://resources/audio/sfx/jump.wav" id="4_ef6xc"]
+[ext_resource type="AudioStream" uid="uid://cxwv4tlica2ga" path="res://resources/audio/sfx/step.wav" id="5_csh65"]
 
 [sub_resource type="Animation" id="Animation_635k8"]
 length = 0.001
@@ -51,6 +53,20 @@ tracks/0/keys = {
 "update": 1,
 "values": [0, 1, 2, 3]
 }
+tracks/1/type = "method"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [],
+"method": &"step"
+}]
+}
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_dnlj3"]
 _data = {
@@ -91,3 +107,12 @@ shape = SubResource("RectangleShape2D_gl3ok")
 
 [node name="BubbleDramaDisplay" parent="." instance=ExtResource("3_7y6n5")]
 position = Vector2(0, -99)
+
+[node name="JumpSFX" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("4_ef6xc")
+volume_db = -10.0
+
+[node name="StepSFX" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("5_csh65")
+volume_db = -25.0
+pitch_scale = 0.8

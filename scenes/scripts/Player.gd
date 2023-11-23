@@ -19,6 +19,7 @@ func _input_process():
 	dir = Vector2(Input.get_action_strength("right") - Input.get_action_strength("left"), 0)
 	
 	if Input.is_action_just_pressed("jump") and is_on_floor():
+		jump_sfx.play()
 		velocity += Vector2(0, -1 * JUMP_SPEED)
 	
 	if Input.is_action_pressed("jump"):

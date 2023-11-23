@@ -53,6 +53,9 @@ var effective_gravity = GRAVITY_WEIGHT
 @onready var sprite = $Sprite
 @onready var drama_display: BubbleDramaDisplay = $BubbleDramaDisplay
 
+@onready var step_sfx = $StepSFX
+@onready var jump_sfx = $JumpSFX
+
 # --------------------------------------------------------------------------------------------------
 # BUILT-INS
 # --------------------------------------------------------------------------------------------------
@@ -128,6 +131,11 @@ func _animation_process():
 	var height = Vector2(0, sprite.texture.get_height() / 2)
 	sprite.offset = height - height.rotated(-angle)
 
+
+func step():
+	if is_on_floor():
+		step_sfx.play()
+
 # --------------------------------------------------------------------------------------------------
 # DRAMA CALLS
 # --------------------------------------------------------------------------------------------------
@@ -139,6 +147,8 @@ func move_h(movement: float):
 
 
 func jump():
+	jump_sfx.play()
+	
 	if is_on_floor():
 		velocity += Vector2(0, -1) * JUMP_SPEED
 		await landed

@@ -1,6 +1,7 @@
-[gd_scene load_steps=4 format=3 uid="uid://b316yvhfet7b3"]
+[gd_scene load_steps=5 format=3 uid="uid://b316yvhfet7b3"]
 
 [ext_resource type="Script" path="res://scenes/scripts/BubbleDramaDisplay.gd" id="1_a7heo"]
+[ext_resource type="AudioStream" uid="uid://br4uidqiyskda" path="res://resources/audio/sfx/speak.wav" id="3_12qaw"]
 [ext_resource type="Theme" uid="uid://kgkrtpvr80cq" path="res://resources/themes/MainTheme.tres" id="3_uk74w"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_m6eke"]
@@ -53,3 +54,7 @@ polygon = PackedVector2Array(232, -44, 244, -22, 232, 0, 280, -22)
 visible = false
 scale = Vector2(-1, 1)
 polygon = PackedVector2Array(232, -44, 244, -22, 232, 0, 280, -22)
+
+[node name="Noise" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("3_12qaw")
+volume_db = -15.0

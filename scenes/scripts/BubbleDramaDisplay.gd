@@ -5,6 +5,8 @@ class_name BubbleDramaDisplay
 signal no_calls
 signal ended_processing
 
+const BASE_PITCH = 1.0
+const VARIATION = 0.2
 
 const LOWER_VERTICES = [3, 4, 5, 6, 7, 8, 9, 10, 11]
 const LINE_SIZE = 54
@@ -37,6 +39,8 @@ var current_choice
 @onready var left_base_pos = left.position
 @onready var right: Polygon2D = $Right
 @onready var right_base_pos = right.position
+
+@onready var noise = $Noise
 
 
 func _ready():
@@ -87,6 +91,9 @@ func _set_raw_text(raw_text: String):
 ## Advance letter if char done
 func _spoke(letter: String):
 	if active:
+		noise.pitch_scale = BASE_PITCH - VARIATION + 2 * VARIATION * randf()
+		noise.play()
+		
 		text.visible_characters += 1
 
 

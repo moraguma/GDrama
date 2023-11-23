@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://e2xapuns3dmk"]
+[gd_scene load_steps=12 format=3 uid="uid://e2xapuns3dmk"]
 
 [ext_resource type="Texture2D" uid="uid://b1j2cmx1b6sa7" path="res://resources/sprites/tilesets/tilemap_packed.png" id="1_ce6c0"]
 [ext_resource type="Texture2D" uid="uid://bsnne10xy7pqh" path="res://resources/sprites/tilesets/tilemap-backgrounds_packed.png" id="1_etbxs"]
@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" uid="uid://by6uku18lw8d0" path="res://scenes/AreaDramaInterface.tscn" id="5_0m6jn"]
 [ext_resource type="PackedScene" uid="uid://p8v6t6buk0ge" path="res://scenes/Character.tscn" id="5_ondmo"]
 [ext_resource type="PackedScene" uid="uid://b316yvhfet7b3" path="res://scenes/BubbleDramaDisplay.tscn" id="6_q2aii"]
+[ext_resource type="AudioStream" uid="uid://ugiyu3yyj02i" path="res://resources/audio/music/Juhani Junkala [Chiptune Adventures] 1. Stage 1.ogg" id="7_xottm"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_btk8d"]
 texture = ExtResource("1_etbxs")
@@ -565,6 +566,11 @@ gdrama_path = "res://resources/dramas/sign.gdrama"
 
 [node name="StandingPos" parent="SignDramaInterface" index="1"]
 position = Vector2(-432, -48)
+
+[node name="Music" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("7_xottm")
+volume_db = -15.0
+autoplay = true
 
 [editable path="Sniffles"]
 [editable path="SnifflesDramaInterface"]

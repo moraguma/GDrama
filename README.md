@@ -1,4 +1,9 @@
-# GDDramaturge
+<p align="center">
+  <img src="icon.png" />
+</p>
+
+
+# GDrama
 
 ## Writing in GDrama
 
