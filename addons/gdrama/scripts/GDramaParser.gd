@@ -500,7 +500,7 @@ func get_highlight(text: String):
 					elif is_character_in_pos(">"):
 						opener_count -= 1
 						if opener_count == 1 and keyword_call:
-							color[pos] = {"color": KEYWORD_COLOR}
+							color[pos + 1] = {"color": KEYWORD_COLOR}
 					advance_pos()
 					if pos >= len(code):
 						break

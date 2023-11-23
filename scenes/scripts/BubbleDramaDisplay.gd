@@ -23,7 +23,7 @@ var current_choice_values
 var current_choice_data
 var current_choice
 
-@onready var char: Character = get_parent()
+@onready var char = get_parent()
 
 @onready var base_pos = position
 @onready var bubble: Polygon2D = $Bubble

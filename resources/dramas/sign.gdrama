@@ -1,0 +1,21 @@
+<beat Start>
+Sign: It goes to show that even a humble sign can engage in the act of conversation
+Sign: What do you want to do?
+
+<beat Choice>
+<choice "Jump!" Jump>
+<choice "Scamper!" Scamper>
+<choice "I'm done" Done>
+
+<beat Jump>
+Sign: <hop You>Alright!
+<jump Choice>
+
+<beat Scamper>
+Sign: <scamper You>Wahoo!
+<stop_scamper You>
+<jump Choice>
+
+<beat Done>
+Sign: And so it goes that a sign is bound to be a sign forevermore
+Sign: Oh well

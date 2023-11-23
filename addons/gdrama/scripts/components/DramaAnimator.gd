@@ -40,7 +40,8 @@ func _ready():
 	add_child(text_timer)
 
 
-# Animates the given direction. Uses the label to display text if it's available
+## Animates the given direction. Returns true if any text was processed or false
+## otherwise
 func animate(steps: Array):
 	is_typing = true
 	
@@ -52,6 +53,7 @@ func animate(steps: Array):
 	set_raw_text.emit(raw_text)
 	
 	# Animation
+	var text_processed = false
 	for step in steps:
 		if step is Array: # Call processing
 			var method_name = step[0]
@@ -64,6 +66,8 @@ func animate(steps: Array):
 				else:
 					callv(method_name, args)
 		elif is_typing: # Text processing
+			text_processed = true
+			
 			step = remove_bbcode(step)
 			var pos = 0
 			while pos < len(step):
@@ -84,6 +88,7 @@ func animate(steps: Array):
 	
 	is_typing = false
 	direction_ended.emit()
+	return text_processed
 
 
 func skip_animation():

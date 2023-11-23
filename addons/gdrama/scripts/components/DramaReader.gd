@@ -112,9 +112,15 @@ func jump(target_beat: String) -> void:
 
 ## Jumps to target beat if flag is true
 func branch(target_beat: String, flag: String) -> void:
+	if get_flag(flag):
+		jump(target_beat)
+
+
+## Returns the value of a flag
+func get_flag(flag: String):
 	if flag in flags:
-		if flags[flag]:
-			jump(target_beat)
+		return flags[flag]
+	return false
 
 
 ## Turns on a local flag
