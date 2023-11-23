@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bqrh160drloxo"
-path="res://.godot/imported/gdrama.png-adad4c923eb48e5ad025b85ab867621b.ctex"
+uid="uid://cljclsfcvbukc"
+path="res://.godot/imported/example.png-856c0a53e9476316422e1f3bebf4813b.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://gdrama.png"
-dest_files=["res://.godot/imported/gdrama.png-adad4c923eb48e5ad025b85ab867621b.ctex"]
+source_file="res://resources/meta/example.png"
+dest_files=["res://.godot/imported/example.png-856c0a53e9476316422e1f3bebf4813b.ctex"]
 
 [params]
 
