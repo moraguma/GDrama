@@ -25,7 +25,7 @@ signal ended_drama(info: String)
 # --------------------------------------------------------------------------------------------------
 # VARIABLES
 # --------------------------------------------------------------------------------------------------
-@onready var drama_reader: DramaReader = DramaReader.new()
+@onready var drama_reader: DramaReader = _get_drama_reader()
 var connected_displays: Array = []
 
 
@@ -34,6 +34,7 @@ var connected_displays: Array = []
 # --------------------------------------------------------------------------------------------------
 func load_gdrama(path: String):
 	drama_reader.load_gdrama(path)
+
 
 ## Connects the signals emitted by this node to the respective functions in the
 ## given DramaDisplay
@@ -93,15 +94,23 @@ func next_or_skip():
 
 ## Goes to the next line of the dialogue
 func next_line():
-	var line = drama_reader.next_line()
-	match line["type"]:
-		"CHOICE":
-			ask_for_choice.emit(line)
-		"END":
-			ended_drama.emit(line["info"])
-		"DIRECTION":
-			set_actor.emit(line["actor"])
-			animate(line["direction"])
+	var text_processed = false
+	while not text_processed:
+		text_processed = true
+		var line = drama_reader.next_line()
+		match line["type"]:
+			GDramaResource.CHOICE:
+				ask_for_choice.emit(line)
+			GDramaResource.END:
+				ended_drama.emit(line["info"])
+			GDramaResource.DIRECTION:
+				var actor_name = ""
+				for s in line["actor"]:
+					if not s is Array:
+						actor_name += s
+				
+				set_actor.emit(actor_name)
+				text_processed = await animate(line["specification"])
 
 
 ## Makes a choice. Should only be called after an ask_for_choice signal and
@@ -109,3 +118,9 @@ func next_line():
 func make_choice(choice: int):
 	drama_reader.make_choice(choice)
 	next_line()
+
+
+## Can be overriden in scripts that inherits from this one to return a custom
+## DramaReader implementation
+func _get_drama_reader() -> DramaReader:
+	return DramaReader.new()

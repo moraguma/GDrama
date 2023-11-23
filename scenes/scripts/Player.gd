@@ -28,12 +28,12 @@ func _input_process():
 	
 	if Input.is_action_just_pressed("talk") and drama_interface != null:
 		take_control()
-		await move_h(drama_interface.standing_pos[0] - position[0])
-		queue_flip_h = drama_interface.look_left
-		
 		var drama_interface_ref = drama_interface
-		drama_interface.drama_player.connect_display(drama_display)
-		await drama_interface.play_drama()
+		await move_h(drama_interface.standing_pos[0] - position[0])
+		queue_flip_h = drama_interface_ref.look_left
+		
+		drama_interface_ref.drama_player.connect_display(drama_display)
+		await drama_interface_ref.play_drama()
 		drama_interface_ref.drama_player.disconnect_display(drama_display)
 		
 		if drama_interface != null:

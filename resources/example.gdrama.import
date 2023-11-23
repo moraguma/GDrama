@@ -1,0 +1,14 @@
+[remap]
+
+importer="gdrama_importer"
+type="Resource"
+uid="uid://cg4ujjol42p8c"
+path="res://.godot/imported/example.gdrama-f04ad2c6c42b68b466059fbc582a1cd8.tres"
+
+[deps]
+
+source_file="res://resources/example.gdrama"
+dest_files=["res://.godot/imported/example.gdrama-f04ad2c6c42b68b466059fbc582a1cd8.tres"]
+
+[params]
+

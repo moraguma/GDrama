@@ -1,0 +1,44 @@
+<beat Start>
+	<branch HasTalked talked>
+	<flag talked>
+	Talky: Hey! Welcome to the GDrama demo!
+	Talky: As you can see... <wait 0.5><hop Talky>my name is Talky! <wait 0.5>I'm here to give you a little introduction to GDrama
+	Talky: But first, <wait 0.2>I wanna ask you a question
+	Talky: What is it that brought you here?
+	<choice "I wanna make dialogue systems for my own games!" GameDev>
+	<choice "I found this randomly and wanted to check it out" Random>
+	<choice "Actually, I'm here to talk to you specifically" TalkyFan>
+
+<beat GameDev>
+	Talky: <scamper Talky>Ah, that's so fun! <wait 0.5>I love games with cool dialogue systems!
+	Talky: <stop_scamper Talky>I hope GDrama has what you're looking for!
+	<jump NormalEnd>
+
+<beat Random>
+	Talky: <hop Talky>Ha! That's interesting
+	Talky: Then I hope you have fun exploring!
+	Talky: Speaking of which...
+	<jump NormalEnd>
+
+<beat TalkyFan>
+	<flag fan>
+	Talky: <hop Talky>Oh! <wait 0.5>Ha ha... <wait 0.5>Now you got me flustered...
+	Talky: Um... <wait 0.5>Anyway...
+	<jump NormalEnd>
+
+<beat NormalEnd>
+	Talky: You can take a walk around this area to talk to some other people!
+	Talky: I Hope you enjoy GDrama!
+	<end>
+
+<beat HasTalked>
+	Talky: <hop Talky>Back for more Talky, eh?
+	Talky: I'll be here for a while, feel free to take a walk around!
+	<branch HasTalkedFan fan>
+	<end>
+
+<beat HasTalkedFan>
+	Talky: (Unless... <wait 0.5>maybe they missed me?)
+	Talky: (Ha ha... <wait 0.5>stop being silly...)
+	<unflag fan>
+	<end>

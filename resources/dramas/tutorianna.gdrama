@@ -1,0 +1,66 @@
+<beat Start>
+<branch TalkedBefore talked>
+<flag asked_directions>
+<flag asked_choices>
+
+<beat FirstConversation>
+Tutorianna: [wave]Hello!
+Tutorianna: My name is [wave]Tutorianna!
+Tutorianna: I'm am a magical being created for the express purpose of teaching you about [wave]GDrama!
+Tutorianna: <hop Tutorianna>[shake]That's very cool right?
+<choice "It's cool" Continue>
+<choice "It's the coolest thing ever" Continue>
+
+<beat Continue>
+Tutorianna: [wave]I know!!!
+<jump Questions>
+
+<beat TalkedBefore>
+Tutorianna: [wave]Hello again!!!
+<jump Questions>
+
+<beat Questions>
+Tutorianna: Is there something you want to know more about?
+<choice "Tell me about directions" Directions <get_flag asked_directions>>
+<choice "Tell me about choices" Choices <get_flag asked_choices>>
+<choice "Not really" Bye>
+
+<beat Directions>
+<unflag asked_directions>
+Tutorianna: Well, directions are what you're seeing [wave]right now!
+Tutorianna: They're the main building block of GDrama scenes
+Tutorianna: Each direction includes an actor name - in my case it's [wave]Tutorianna
+Tutorianna: And also a list of steps to that direction
+Tutorianna: Each step can be either a [wave]dialogue or a call!
+Tutorianna: For instance, I can... <wait 0.5>[wave]wait... <wait 0.5> between... <wait 0.5>words!
+Tutorianna: I can also... <wait 0.5><hop Tutorianna>[wave]jump![/wave]<wait 0.5> in the middle of a conversation!
+Tutorianna: Or scamper! <scamper Tutorianna><wait 0.5> [wave]La la la la la la!
+Tutorianna: <stop_scamper Tutorianna>And a bunch more! <wait 0.5>GDrama is made so you can [wave]create new calls based on the necessities of your game
+Tutorianna: As such, directions can be used to handle all sorts of different cutscenes
+<jump Questions>
+
+<beat Choices>
+<unflag asked_choices>
+Tutorianna: Well, you just made a choice, didn't you?
+Tutorianna: Choices are used handle different paths through the same scene
+Tutorianna: They work just like the one you just saw... [wave]but they also have some secrets!
+Tutorianna: For instance, you might notice that questions you can ask me disappear after you've asked them a first time
+Tutorianna: That's because choices can also be affected by flags set in and out of a scene!
+Tutorianna: There's all sorts of things you can do with implementation of custom dialogue logic...
+Tutorianna: An example of this is that if you talk to me a second time...
+Tutorianna: [wave]I might say something different!
+<jump Questions>
+
+<beat Bye>
+<branch ByeAgain talked>
+<flag talked>
+Tutorianna: [wave]Alright![/wave] <wait 0.5>I'll be here if you need me
+Tutorianna: Remember, there's a lot more GDrama can do [wave]behind the scenes...
+Tutorianna: You can find out more about the project in its [wave]repository!
+<end>
+
+<beat ByeAgain>
+Tutorianna: Okay! [wave]I'll see you around!!!
+Tutorianna: <scamper Tutorianna>[wave]Hope you enjoy!!! <wait 0.5>GDrama!!!<stop_scamper Tutorianna>
+
+

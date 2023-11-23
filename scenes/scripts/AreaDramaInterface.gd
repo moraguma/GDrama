@@ -8,13 +8,15 @@ class_name AreaDramaInterface
 
 
 func display_trigger():
-	intro_drama_display.showing = true
-	intro_drama_display.display("E", "", false)
-	intro_drama_display.next.hide()
+	if not playing:
+		intro_drama_display.showing = true
+		intro_drama_display.display("E", "", false)
+		intro_drama_display.next.hide()
 
 
 func hide_trigger():
-	intro_drama_display.showing = false
+	if not playing:
+		intro_drama_display.showing = false
 
 
 func play_drama():
