@@ -4,112 +4,25 @@
 
 
 # GDrama
+GDrama is a simple framework for writing cutscenes in Godot. It supports a bunch of features that you might expect from any game that includes dialogue, such as choices, dialogue boxes and character animations! This addon was made to provide a base from which a developer may create their cutscene system considering the particular needs of their game
+
+<p align="center">
+  <img src="example.png" />
+</p>
 
 ## Writing in GDrama
 
-GDrama is a simple language to write cutscenes. In practice, all .gdrama files are converted to a JSON format. GDrama exists to make writing scenes easier.
+The GDrama language is used to write cutscenes. It is meant to resemble a screenplay! Here's what a simple dialogue looks like
 
-For instance, this is a simple scene written in GDrama.
+![You can read this in dramas/example.gdrama](gdrama.png)
 
-~~~
-<beat Start>
-    Tom: Hey! (wait 0.5)Over here!(wave)
-    Tom: This is an example scene
-    Tom: [wave]What do you think?
-
-    <choice "I like it!" Like>
-    <choice "Not a huge fan" Dislike>
-
-<beat Like>
-    Tom: Well, I'm glad!
-    <jump End>
-
-<beat Dislike>
-    Tom: That's a shame
-    <jump End>
-
-<beat End>
-    Tom: Anyway, I have to go
-    <end "Regular ending">
-~~~
-
-When converted to JSON, it will look like this
-
-~~~json
-{
-    "start": "Start",
-    "beats": {
-        "Start": {
-            "steps": {
-                "0": {
-                    "type": "DIRECTION",
-                    "actor": "Tom",
-                    "direction": "Hey! (wait 0.5)Over here!(wave)"
-                },
-                "1": {
-                    "type": "DIRECTION",
-                    "actor": "Tom",
-                    "direction": "This is an example scene"
-                },
-                "2": {
-                    "type": "DIRECTION",
-                    "actor": "Tom",
-                    "direction": "[wave]What do you think?"
-                },
-                "3": {
-                    "type": "CHOICE",
-                    "choices": ["I like it!", "Not a huge fan"],
-                    "results": ["Like", "Dislike"],
-                    "conditions": ["{get_true}", "{get_true}"]
-                }
-            },
-            "next": "Like"
-        },
-        "Like": {
-            "steps": {
-                "0": {
-                    "type": "DIRECTION",
-                    "actor": "Tom",
-                    "direction": "Well, I'm glad!"
-                },
-                "1": {
-                    "type": "CALL",
-                    "call": "{jump End}"
-                }
-            },
-            "next": "Dislike"
-        },
-        "Dislike": {
-            "steps": {
-                "0": {
-                    "type": "DIRECTION",
-                    "actor": "Tom",
-                    "direction": "That's a shame"
-                },
-                "1": {
-                    "type": "CALL",
-                    "call": "{jump End}"
-                }
-            },
-            "next": "End"
-        },
-        "End": {
-            "steps": {
-                "0": {
-                    "type": "DIRECTION",
-                    "actor": "Tom",
-                    "direction": "Anyway, I have to go"
-                },
-                "1": {
-                    "type": "END",
-                    "info": "Regular ending"
-                }
-            },
-            "next": ""
-        }
-    }
-}
-~~~
+```mermaid
+graph TD;
+    A-->B;
+    A-->C;
+    B-->D;
+    C-->D;
+```
 
 ## Commands
 
