@@ -10,54 +10,65 @@ GDrama is a simple framework for writing cutscenes in Godot. It supports a bunch
   <img src="example.png" />
 </p>
 
-## Writing in GDrama
+## Quickstart
 
-The GDrama language is used to write cutscenes. It is meant to resemble a screenplay! Here's what a simple dialogue looks like
+A more thorough tutorial may be created in the future if there's demand for it. For now, you can explore the example project provided to see to use GDrama in practice!
+
+## How it works
+
+The GDrama language is used to write cutscenes inside the Godot editor. It is meant to resemble a screenplay! Here's what a simple dialogue looks like
 
 ![You can read this in dramas/example.gdrama](gdrama.png)
 
-```mermaid
-graph TD;
-    A-->B;
-    A-->C;
-    B-->D;
-    C-->D;
-```
+The .gdrama files created within Godot will be automatically imported and processed during runtime. They follow a simple pipeline:
+
+1. Importer - Processes the .gdrama file into a resource that can be used by Godot
+2. DramaReader - Will read a GDramaResource and supply lines in order so they can be animated
+3. DramaAnimator - Will take in lines and animated them
+
+For starting more quickly, two nodes can be set up to run dramas very easily. These are:
+
+- DramaDisplay - Used to display dialogue and run animation calls. Can be, for instance, a dialogue bubble
+- DramaInterface - Used for starting a particular drama. Can be seen as a connection between regular gameplay and a cutscene
 
 ## Commands
 
-GDrama uses a few special characters for its commands. If any of them must be used as part of direction, the \ character can be used before them to avoid them being detected as a command
+Commands used in GDrama are enveloped in **<>**. Depending on the command, they can be processed at different parts of the drama pipeline
 
-### <> - .gdrama level commands
+### Importer
 
-Commands wrapped up in <> are going to be completely processed by the time the .gdrama file is converted into a JSON
+These commands appear as red in the GDrama syntax highlighter and are processed in the importing stage.
 
-|Function|Use|
+|Command|Use|
 |---|---|
-|\<_const_ "Const name" "Const value">| Defines a new constant|
-|\<_import_ "path"| Imports constants from provided .gdrama file|
-|\<_get_ "Const name">|Substituted by the constant. Can also be used as \$name or $"Const name"|
-|\<_beat_ "Beat Name">|Marks the start of a new beat|
-|\<_call_ {_function_ arg1, arg2...}>|Calls a DramaReader level function|
-|\<_jump_ "Beat name">| Jumps to the specified beat. Is actually a DramaReader level function - equivalent to \<_call_ {jump "Beat name"}>|
-|\<_choice_ "Choice text" "Resulting beat" {DramaReader condition}>|Defines a new choice with an existence condition. If no existence condition is defined, it is set as true by default|
-|\<_end_ "Info">|Defines an ending|
+|<beat BeatName\>|Defines a new beat. Beats are labels that can be jumped between in the middle of dialogue|
+|<choice "Choice text" ResultingBeat <condition_call>>|Defines a new choice bundled with the choices declared next to it. If it is chosen, the dialogue will skip to the specified ResultingBeat. Can also include a call that will be triggered when this choice is called so that the choice will only be valid if it returns true|
+|<end "Info">|Ends the drama. Can include information about the ending|
+|<const name value\>|Defines a constant with the specified value. This constant can be accesed in the drama by using $name or \$"name"|
+|<import path\>|Imports all constants from the given drama|
 
-### {} - DramaReader level commands
+### DramaReader
+Commands from here on will appear as pink in the GDrama syntax highlighter. From here, the developer is encouraged to create commands of their own to fit their needs.
 
-Commands wrapped up in {} are processed in runtime as the DramaReader encounters them. As such, they are present in the generated JSON file. These commands are direct function calls to the to_call object in the DramaReader
+DramaReader commands will be processed while the next line to be processed is being chosen. As such, they are particularly well suited to tasks such as navigating the drama in unique ways or substituting fields in the text, like getting the player's name. These are the built-in DramaReader commands.
 
-{_function_ arg1 arg2...}
+|Command|Use|
+|---|---|
+|<jump BeatName\>|Jumps to the specified beat|
+|<flag FlagName\>|Turns a flag on. These flags are saved locally in the DramaReader object but this implementation can be modified to, for instance, save them somewhere all dramas can access|
+|<unflag FlagName\>|Turns a flag off|
+|<get_flag FlagName\>|Gets the value of a flag|
+|<branch TargetBeat FlagName\>|If the given flag is active, jumps to the specified beat, otherwise, goes to the next line|
 
-### () - DramaAnimator level commands
+### DramaAnimator
+Handles commands that are meant to play mid-animation, such as creating a pause between words or changing a character's speaking speed. Commands that aren't processed by the DramaAnimator will be aired out to all DramaDisplays connected to it - that's when commands you defined in them will run.
 
-Commands wrapped up in () are processed only by the DramaAnimator. As such, the returned values from the DramaReader will have these segments intact
+These are the built-in DramaAnimator commands
 
-(_function_ arg1 arg2...)
-
-### [] - BBCode
-
-These values will not be touched at all by GDrama. These commands can be used for injecting BBCode in direction when it is being used in conjunction with the RichTextLabel
+|Command|Use|
+|---|---|
+|<speed time\>|Changes the time waited between characters|
+|<wait time\>|Waits the specified time before continuing the animation|
 
 ## Copyright
 
