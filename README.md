@@ -7,7 +7,7 @@
 GDrama is a simple framework for writing cutscenes in Godot. It supports a bunch of features that you might expect from any game that includes dialogue, such as choices, dialogue boxes and character animations! This addon was made to provide a base from which a developer may create their cutscene system considering the particular needs of their game
 
 <p align="center">
-  <img src="example.png" />
+  <img src="resources/meta/example.png" />
 </p>
 
 ## Quickstart
@@ -18,7 +18,7 @@ A more thorough tutorial may be created in the future if there's demand for it. 
 
 The GDrama language is used to write cutscenes inside the Godot editor. It is meant to resemble a screenplay! Here's what a simple dialogue looks like
 
-![You can read this in dramas/example.gdrama](gdrama.png)
+![You can read this in dramas/example.gdrama](resources/meta/gdrama.png)
 
 The .gdrama files created within Godot will be automatically imported and processed during runtime. They follow a simple pipeline:
 
