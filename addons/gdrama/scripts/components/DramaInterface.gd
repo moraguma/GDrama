@@ -52,6 +52,6 @@ func play_drama():
 
 
 ## Can be overriden in scripts that inherit from this one to return a custom
-## DramaReader implementation
+## DramaPlayer implementation
 func _get_drama_player() -> DramaPlayer:
 	return DramaPlayer.new()
