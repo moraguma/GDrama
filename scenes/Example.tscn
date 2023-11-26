@@ -509,6 +509,9 @@ intro_drama_display = NodePath("../Sniffles/BubbleDramaDisplay")
 drama_displays = [NodePath("../Sniffles/BubbleDramaDisplay")]
 gdrama_path = "res://resources/dramas/sniffles.gdrama"
 
+[node name="Hitbox" parent="SnifflesDramaInterface/Area" index="0"]
+position = Vector2(-7, 0)
+
 [node name="StandingPos" parent="SnifflesDramaInterface" index="1"]
 position = Vector2(-393, 72)
 
