@@ -2,11 +2,21 @@ extends Resource
 class_name DramaReader
 
 
+const MAX_LOG_SIZE = 100
+
+
+## Signals that this line has just been added to the log
+signal added_to_log(line)
+
+
 var drama: GDramaResource
 var beat: String
 var pointer: int
 var to_call: Object
 var flags: Dictionary = {}
+
+var log: Array = []
+var log_modifiers: Array[Callable] = []
 
 
 func _init():
@@ -33,12 +43,14 @@ func make_choice(choice: int) -> void:
 	assert(line["type"] == GDramaResource.CHOICE, "Called make_choice on non choice line")
 	assert(choice >= 0 and choice < len(line["results"]), "Invalid choice " + str(choice) + " at line " + JSON.stringify(line))
 	jump(line["results"][choice])
+	log[-1]["selection"] = choice
 
 
 ## Returns drama to first beat
 func reset_drama():
 	assert(drama != null, "Called reset_drama with no drama loaded")
 	jump(drama["start"])
+	log = []
 
 
 ## Returns the next line and advances the pointer by one. The return is a line
@@ -73,6 +85,8 @@ func next_line() -> Dictionary:
 					result["conditions"][i] = call_result
 			GDramaResource.END:
 				result = line
+	
+	add_to_log(result)
 	return result
 
 
@@ -99,6 +113,21 @@ func get_call_result(a: Array):
 	if has_method(a[0]):
 		return callv(a[0], a.slice(1))
 	return null
+
+
+## Passes this line through all modifiers set in log_modifiers before adding it
+## to the log
+func add_to_log(line: Dictionary):
+	line = line.duplicate(true)
+	
+	for modifier in log_modifiers:
+		line = modifier.call(line)
+	
+	if len(log) >= MAX_LOG_SIZE:
+		log.pop_at(0)
+	log.append(line)
+	
+	added_to_log.emit(line)
 
 
 # ------------------------------------------------------------------------------

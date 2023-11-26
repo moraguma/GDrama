@@ -46,10 +46,7 @@ func animate(steps: Array):
 	is_typing = true
 	
 	# Define raw_text
-	var raw_text = ""
-	for step in steps:
-		if not step is Array:
-			raw_text += step
+	var raw_text = extract_raw_text(steps)
 	set_raw_text.emit(raw_text)
 	
 	# Animation
@@ -89,6 +86,15 @@ func animate(steps: Array):
 	is_typing = false
 	direction_ended.emit()
 	return text_processed
+
+
+## Extracts the raw string text from a sequence of steps
+func extract_raw_text(steps: Array):
+	var raw_text = ""
+	for step in steps:
+		if not step is Array:
+			raw_text += step
+	return raw_text
 
 
 func skip_animation():
