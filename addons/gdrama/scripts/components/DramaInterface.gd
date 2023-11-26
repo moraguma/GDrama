@@ -34,7 +34,7 @@ func _get_configuration_warnings():
 
 
 func _ready():
-	drama_player = DramaPlayer.new()
+	drama_player = _get_drama_player()
 	add_child(drama_player)
 	
 	drama_player.load_gdrama(gdrama_path)
@@ -49,3 +49,9 @@ func play_drama():
 	await drama_player.ended_drama
 	
 	playing = false
+
+
+## Can be overriden in scripts that inherit from this one to return a custom
+## DramaPlayer implementation
+func _get_drama_player() -> DramaPlayer:
+	return DramaPlayer.new()
