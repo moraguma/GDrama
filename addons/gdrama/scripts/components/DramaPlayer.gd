@@ -120,7 +120,19 @@ func make_choice(choice: int):
 	next_line()
 
 
+## Processes a log, extracting the raw text from each direction through the
+## method defined in DramaAnimator
+func process_log(line: Dictionary):
+	if line["type"] == GDramaResource.DIRECTION:
+		line["actor"] = extract_raw_text(line["actor"])
+		line["specification"] = extract_raw_text(line["specification"])
+	return line
+
+
 ## Can be overriden in scripts that inherits from this one to return a custom
 ## DramaReader implementation
 func _get_drama_reader() -> DramaReader:
-	return DramaReader.new()
+	var drama_reader = DramaReader.new()
+	drama_reader.log_modifiers.append(process_log)
+	
+	return drama_reader
