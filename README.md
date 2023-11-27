@@ -70,6 +70,10 @@ These are the built-in DramaAnimator commands
 |<speed time\>|Changes the time waited between characters|
 |<wait time\>|Waits the specified time before continuing the animation|
 
+## Resources
+
+[Vim syntax highlighting for GDrama](https://github.com/squk/gdrama-syntax.vim) made by [squk](https://github.com/squk)
+
 ## Copyright
 
 Copyright/attribution is not required, though appreciated. Credit me as Moraguma and link to https://moraguma.itch.io/
