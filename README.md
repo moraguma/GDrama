@@ -72,7 +72,7 @@ These are the built-in DramaAnimator commands
 
 ## Resources
 
-[Vim syntax highlighting for GDrama](https://github.com/squk/gdrama-syntax.vim) made by @squk
+[Vim syntax highlighting for GDrama](https://github.com/squk/gdrama-syntax.vim) made by [squk](https://github.com/squk)
 
 ## Copyright
 
