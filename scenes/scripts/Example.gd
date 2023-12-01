@@ -45,9 +45,9 @@ func add_log(log):
 			for i in len(log["choices"]):
 				if log["conditions"][i]:
 					if log["selection"] == i:
-						label.text += log["choices"][i] + "\\n"
+						label.text += log["choices"][i] + "\n"
 					else:
-						label.text += "[color=" + UNCHOSEN_COLOR + "]" + log["choices"][i] + "[/color]\\n"
+						label.text += "[color=" + UNCHOSEN_COLOR + "]" + log["choices"][i] + "[/color]\n"
 		GDramaResource.END:
 			label.text = "[center]End of conversation"
 			if log["info"] != "":
