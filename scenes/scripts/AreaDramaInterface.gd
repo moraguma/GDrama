@@ -2,6 +2,7 @@ extends DramaInterface2D
 class_name AreaDramaInterface
 
 @onready var standing_pos: Vector2 = position + $StandingPos.position
+@onready var game: Game = get_parent()
 
 @export var intro_drama_display: BubbleDramaDisplay
 @export var look_left = false
@@ -20,4 +21,8 @@ func hide_trigger():
 
 
 func play_drama():
+	game.connect_logs(drama_player.drama_reader)
+	
 	await super.play_drama()
+	
+	game.reset_logs()
