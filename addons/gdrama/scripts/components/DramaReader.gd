@@ -43,7 +43,9 @@ func make_choice(choice: int) -> void:
 	assert(line["type"] == GDramaResource.CHOICE, "Called make_choice on non choice line")
 	assert(choice >= 0 and choice < len(line["results"]), "Invalid choice " + str(choice) + " at line " + JSON.stringify(line))
 	jump(line["results"][choice])
+	
 	log[-1]["selection"] = choice
+	added_to_log.emit(log[-1])
 
 
 ## Returns drama to first beat
@@ -59,6 +61,7 @@ func next_line() -> Dictionary:
 	assert(drama != null, "Called next_line with no drama loaded")
 	
 	var result
+	var should_add_to_log = true
 	while result == null:
 		# If current line is invalid
 		if pointer >= len(drama.beats[beat]["lines"]):
@@ -83,10 +86,11 @@ func next_line() -> Dictionary:
 					if not call_result is bool:
 						push_warning("Result of call " + result["conditions"] + " is not bool. This may cause unexpected behavior")
 					result["conditions"][i] = call_result
+				should_add_to_log = false
 			GDramaResource.END:
 				result = line
 	
-	add_to_log(result)
+	add_to_log(result, should_add_to_log)
 	return result
 
 
@@ -117,7 +121,7 @@ func get_call_result(a: Array):
 
 ## Passes this line through all modifiers set in log_modifiers before adding it
 ## to the log
-func add_to_log(line: Dictionary):
+func add_to_log(line: Dictionary, emit_signal: bool):
 	line = line.duplicate(true)
 	
 	for modifier in log_modifiers:
@@ -127,7 +131,8 @@ func add_to_log(line: Dictionary):
 		log.pop_at(0)
 	log.append(line)
 	
-	added_to_log.emit(line)
+	if emit_signal:
+		added_to_log.emit(line)
 
 
 # ------------------------------------------------------------------------------
