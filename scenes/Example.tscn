@@ -498,6 +498,7 @@ limit_right = 6000
 position_smoothing_enabled = true
 
 [node name="Logs" type="Node2D" parent="Player/Camera2D"]
+visible = false
 
 [node name="ColorRect" type="ColorRect" parent="Player/Camera2D/Logs"]
 offset_left = -752.0
