@@ -41,11 +41,11 @@ var og_textfile_extensions
 
 func _enter_tree():
 	if Engine.is_editor_hint():
-		og_textfile_extensions = get_editor_interface().get_editor_settings().get_setting("docks/filesystem/textfile_extensions")
-		get_editor_interface().get_editor_settings().set_setting("docks/filesystem/textfile_extensions", og_textfile_extensions + ",gdrama")
+		og_textfile_extensions = EditorInterface.get_editor_settings().get_setting("docks/filesystem/textfile_extensions")
+		EditorInterface.get_editor_settings().set_setting("docks/filesystem/textfile_extensions", og_textfile_extensions + ",gdrama")
 		
 		var gdrama_syntax_highlighter: GDramaSyntaxHighlighter = GDramaSyntaxHighlighter.new()
-		get_editor_interface().get_script_editor().register_syntax_highlighter(gdrama_syntax_highlighter)
+		EditorInterface.get_script_editor().register_syntax_highlighter(gdrama_syntax_highlighter)
 		
 		import_plugin = GDramaImportPlugin.new()
 		import_plugin.editor_plugin = self
@@ -57,7 +57,7 @@ func _enter_tree():
 
 func _exit_tree():
 	if Engine.is_editor_hint():
-		get_editor_interface().get_editor_settings().set_setting("docks/filesystem/textfile_extensions", og_textfile_extensions)
+		EditorInterface.get_editor_settings().set_setting("docks/filesystem/textfile_extensions", og_textfile_extensions)
 		
 		remove_import_plugin(import_plugin)
 		for name in TYPE_NAMES:
