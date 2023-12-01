@@ -21,7 +21,9 @@ func hide_trigger():
 
 
 func play_drama():
+	print("Trying to connect logs")
 	game.connect_logs(drama_player.drama_reader)
+	print("Connected logs")
 	
 	await super.play_drama()
 	
