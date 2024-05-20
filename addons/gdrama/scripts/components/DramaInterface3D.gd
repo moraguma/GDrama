@@ -45,7 +45,7 @@ func _ready():
 func play_drama():
 	playing = true
 	
-	drama_player.start_drama()
+	drama_player.start_drama.call_deferred()
 	await drama_player.ended_drama
 	
 	playing = false
