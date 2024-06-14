@@ -14,6 +14,8 @@ GDrama is a simple framework for writing cutscenes in Godot. It supports a bunch
 
 A more thorough tutorial may be created in the future if there's demand for it. For now, you can explore the example project provided to see to use GDrama in practice!
 
+If you're struggling to create a .gdrama file, a step-by-step explanation can be found [here](https://github.com/moraguma/GDrama/issues/18).
+
 ## How it works
 
 The GDrama language is used to write cutscenes inside the Godot editor. It is meant to resemble a screenplay! Here's what a simple dialogue looks like
