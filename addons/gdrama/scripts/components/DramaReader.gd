@@ -29,7 +29,7 @@ func _init():
 ## Loads a .gdrama file. If successful, the drama and pointer variables are 
 ## updated 
 func load_gdrama(path: String) -> void:
-	assert(FileAccess.file_exists(path), "Attempted to load inexistent drama at " + path)
+	assert(ResourceLoader.exists(path), "Attempted to load inexistent drama at " + path)
 	
 	drama = load(path)
 	jump(drama.start)

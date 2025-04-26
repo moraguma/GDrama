@@ -1,6 +1,6 @@
 [gd_scene load_steps=12 format=3 uid="uid://p8v6t6buk0ge"]
 
-[ext_resource type="Script" path="res://scenes/scripts/Character.gd" id="1_uc1gm"]
+[ext_resource type="Script" uid="uid://bljfsr2xqfek4" path="res://scenes/scripts/Character.gd" id="1_uc1gm"]
 [ext_resource type="Texture2D" uid="uid://dweoiradnaxsj" path="res://resources/sprites/Player.png" id="2_qxeo3"]
 [ext_resource type="PackedScene" uid="uid://b316yvhfet7b3" path="res://scenes/BubbleDramaDisplay.tscn" id="3_7y6n5"]
 [ext_resource type="AudioStream" uid="uid://c8exrsi0y214e" path="res://resources/audio/sfx/jump.wav" id="4_ef6xc"]
@@ -70,9 +70,9 @@ tracks/1/keys = {
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_dnlj3"]
 _data = {
-"RESET": SubResource("Animation_635k8"),
-"idle": SubResource("Animation_tmox1"),
-"move": SubResource("Animation_rjr7r")
+&"RESET": SubResource("Animation_635k8"),
+&"idle": SubResource("Animation_tmox1"),
+&"move": SubResource("Animation_rjr7r")
 }
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_nbie2"]
@@ -94,7 +94,7 @@ frame = 1
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 libraries = {
-"": SubResource("AnimationLibrary_dnlj3")
+&"": SubResource("AnimationLibrary_dnlj3")
 }
 
 [node name="BodyShape" type="CollisionShape2D" parent="."]
