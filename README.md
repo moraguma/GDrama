@@ -12,9 +12,39 @@ GDrama is a simple framework for writing cutscenes in Godot. It supports a bunch
 
 ## Quickstart
 
-A more thorough tutorial may be created in the future if there's demand for it. For now, you can explore the example project provided to see to use GDrama in practice!
+This quick tutorial will go through the process of creating a simple dialog and having it show up in game. To get a more thorough understanding of the capabilities of GDrama, it is recommended to explore the example project provided.
 
-If you're struggling to create a .gdrama file, a step-by-step explanation can be found [here](https://github.com/moraguma/GDrama/issues/18).
+### Installation
+
+This works like installing any other Godot addon. Just download the latest version, move the gdrama folder to your project's addons folder, then enable it on Project Settings.
+
+For this tutorial, you should download the entire project as a zip, as we will be using the provided example scene.
+
+### Creating a simple drama
+
+To create a .gdrama file and edit it in the Godot editor, go to the Script top tab, then go to `File > New Text File...` and create a new file with the extension `.gdrama`. For instance, `example.gdrama`. You show now be able to edit the file in the Godot editor. If syntax highlighting isn't on by default, you can turn it on in `Edit > Syntax Highlighting > GDrama`. Paste the following GDrama code in the created file.
+
+```
+<beat start>
+	Godette: Hi!
+	Godette: This is an example drama
+```
+
+If the file isn't imported automatically you may need to import it manually by clicking it on the file explorer and clicking the import tab. If this isn't working, restarting the editor should fix this issue.
+
+**Remember to manually reimport every time you make changes to this file.**
+
+### Playing a drama ingame
+
+We will use the example BubbleDramaInterface to manage the drama and the BubbleDramaInterface to display the words. Go to the example scene at `res://scenes/Example.tscn` and add the specified nodes to somewhere the player can reach. Your scene should look like this.
+
+<p align="center">
+  <img src="resources/meta/quickstart_editor.png" />
+</p>
+
+Now, for the BubbleDramaDisplay, set the `Actor Name` as `Godette`. This will associate it with the actor in our example drama. Then, for the BubbleDramaInterface, set the `IntroDramaDisplay` as our BubbleDramaDisplay. Also add our BubbleDramaDisplay in `Drama Displays`. Finally, set the `Gdrama path` as the path to the created `.gdrama` as shown in the file system. This will associate this DramaInterface to our `.gdrama`, and will tell it to call our DramaDisplay to look for those actors. You should now be able to play your new dialog when running the project.
+
+AreaDramaInterface and BubbleDramaDisplay are created specifically for the GDrama demo. It is recommended to study their code to see how they extend from the base classes of DramaInterface2D and DramaDisplay2D so that you can create custom solutions for your game.
 
 ## How it works
 
