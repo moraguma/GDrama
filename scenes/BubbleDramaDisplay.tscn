@@ -1,6 +1,6 @@
 [gd_scene load_steps=5 format=3 uid="uid://b316yvhfet7b3"]
 
-[ext_resource type="Script" path="res://scenes/scripts/BubbleDramaDisplay.gd" id="1_a7heo"]
+[ext_resource type="Script" uid="uid://ced80n0pogypd" path="res://scenes/scripts/BubbleDramaDisplay.gd" id="1_a7heo"]
 [ext_resource type="AudioStream" uid="uid://br4uidqiyskda" path="res://resources/audio/sfx/speak.wav" id="3_12qaw"]
 [ext_resource type="Theme" uid="uid://kgkrtpvr80cq" path="res://resources/themes/MainTheme.tres" id="3_uk74w"]
 
